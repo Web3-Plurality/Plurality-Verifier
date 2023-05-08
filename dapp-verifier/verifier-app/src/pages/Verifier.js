@@ -7,7 +7,6 @@ import mortgage from '../images/mortgage.png';
 import axios from 'axios'; 
 import { encode } from "base-64";
 
-
 const Verifier = () => {
   const [text, setText] = useState("");
 
@@ -24,7 +23,6 @@ const Verifier = () => {
   const proofTemplateId = "ecfacbf5-c75b-4867-bcf6-9258ede36525";
 
   function generateQR() {
-
     axios.post('http://bpa.westeurope.cloudapp.azure.com:8080/api/invitations', {}, {
       auth: {
         username: 'admin',
@@ -127,18 +125,30 @@ const Verifier = () => {
   }
 
   async function createUserIdentity() {
-    identity = new Identity("pairwise-did");
-    message = message + `Step 3/4 Complete: Your identity material has been generated against the seed "pairwise-did". Please copy the following material and keep it safe and private \n
-    Trapdoor: ${identity.trapdoor} \n
-    Nullifier: ${identity.nullifier} \n
-    Commitment: ${identity.commitment} \n \n
+
+    localStorage.setItem("commitment", "");
+    document.dispatchEvent(new CustomEvent('receive_identity_request_from_web_page', {detail: "Plurality Verifier - Test dApp Proof "}));
+
+    identityCommitment = localStorage.getItem("commitment");
+
+    // wait until the user finishes up creating identity in extension
+    while (identityCommitment === "")
+    {
+      await sleep (5000);
+      identityCommitment = localStorage.getItem("commitment");
+    }
+
+    identityCommitment = JSON.parse(identityCommitment);
+    
+    message = message + `Step 3/4 Complete: Your identity material has been generated inside the extension. Please keep it safe and private \n
+    Public Commitment shared by the extension is: ${identityCommitment} \n \n
     Step 4/4 Started: Adding generated identity to a group on smart contract in a privacy-preserving manner \n
     * Verifier creates a group on the semaphore zk smart contract \n
     * Verifier adds the public material of the generated identity to the group \n
-    * After the above two steps, user will now be able to prove his group membership in zero-knowledge way \n`; 
+    * After the above two steps, user will now be able to prove his group membership in zero-knowledge way \n`;
     setTextAreaValue(message);
-    identityCommitment = identity.commitment;
-    window.userIdentity = identity;
+    //identityCommitment = identity.commitment;
+    //window.userIdentity = identity;
     await sleep(5000);
     addZkProofToSemaphore();
   }
@@ -170,6 +180,10 @@ const Verifier = () => {
       setTextAreaValue(message)
     });
   }
+
+  /*useEffect(()=>{
+    createUserIdentity();
+  })*/ // <-- empty dependency array, ensures that the function runs only once on load
 
   useEffect(()=>{
     generateQR();
@@ -205,8 +219,8 @@ const Verifier = () => {
             <canvas ref={canvasRef}  />
           </div>
           {/*<p>Connection Url: {text}</p>*/}
-          
-          <button onClick={generateQR} type="button" class="btn btn-primary me-md-2" data-bs-toggle="button">Generate New Proof Invitation</button>
+          {/*TODO: Change this click back to generateQR */}
+          <button onClick={createUserIdentity} type="button" class="btn btn-primary me-md-2" data-bs-toggle="button">Generate New Proof Invitation</button>
           <br/> <br/>
           <textarea class="form-control" rows="12" value={textAreaValue} aria-label="Disabled input example" disabled readonly></textarea>
         </div>
