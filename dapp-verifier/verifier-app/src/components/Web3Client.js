@@ -161,21 +161,34 @@ export const createGroup = async () => {
 
     //window.groupId = rand;
     //console.log("Creating group with id: "+ window.groupId);
-    
-    const tx = await semaphoreIdentityContract.methods.createGroup(groupId,merkleTreeDepth,signer.address);
-    const receipt = tx
-    .send({
-      from: signer.address,
-      gas: await tx.estimateGas(),
-    })
-    .once("transactionHash", (txhash) => {
-      console.log(`Mining transaction ...`);
-      console.log(`https://${network}.etherscan.io/tx/${txhash}`);
-    });
+    // TODO: Add check if group already exists
+    //get symbol for given contract 
+    semaphoreIdentityContract.methods.groups(groupId).call({ from: process.env.REACT_APP_SEMAPHORE_IDENTITY_CONTRACT }, async function (error, result) {
+      console.log("Result of groups: " + JSON.stringify(result));
+      console.log(result);
+      if (result[0] === "0x0000000000000000000000000000000000000000")
+      {
+        console.log("Group does not exist on chain");
+        const tx = await semaphoreIdentityContract.methods.createGroup(groupId,merkleTreeDepth,signer.address);
+        const receipt = tx
+        .send({
+        from: signer.address,
+        gas: await tx.estimateGas(),
+        })
+        .once("transactionHash", (txhash) => {
+          console.log(`Mining transaction ...`);
+          console.log(`https://${network}.etherscan.io/tx/${txhash}`);
+        });
 
-    // The transaction is now on chain!
-    console.log(`Mined in block ${receipt.blockNumber}`);
-    return receipt;
+        // The transaction is now on chain!
+        console.log(`Mined in block ${receipt.blockNumber}`);
+        return receipt;
+      }
+      else {
+        console.log("Group exists on chain");
+        return "";
+      }
+    });
     
   };
 
