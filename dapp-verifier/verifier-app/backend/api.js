@@ -81,20 +81,44 @@ const GroupSchema = new mongoose.Schema({
 const Group = mongoose.model('groups', GroupSchema);
 Group.createIndexes();
 
+app.get("/group", async (req, resp) => {
+	try {
+		const groupId = req.query.groupId.toString();
+		console.log("Received groupId: "+groupId);
+		const group = await Group.findOne({groupId:groupId});
+
+		if (group) {
+			resp.send(group);
+			console.log("Group sent: "+ group);
+		} else {
+			console.log("Group not found");
+			resp.send("Group not found");
+		}
+	} catch (e) {
+		console.log(e);
+		resp.send("Something Went Wrong"+ e);
+	}
+});
+
 app.post("/group", async (req, resp) => {
 	try {
+		console.log("Received request");
+		console.log(req.body);
 		const group = new Group(req.body);
+		console.log("Created new group"+group);
 		let result = await group.save();
+		console.log("Saved group");
 		result = result.toObject();
 		if (result) {
 			resp.send(req.body);
-			console.log(result);
+			console.log("Done"+result);
 		} else {
 			console.log("Group state saved");
 		}
 
 	} catch (e) {
-		resp.send("Something Went Wrong");
+		console.log(e);
+		resp.send("Something Went Wrong"+ e);
 	}
 });
 
