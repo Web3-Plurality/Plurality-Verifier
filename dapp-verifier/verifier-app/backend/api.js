@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
+require("dotenv").config();
 
 // TODO: Read url from .env file
-mongoose.connect('mongodb+srv://plurality:jYTzrK8p5dnOx1L3@cluster0.fpzntym.mongodb.net/?retryWrites=true&w=majority', {
+mongoose.connect(process.env.CONNECTION_URL, {
     dbName: 'database',
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -72,13 +73,9 @@ const GroupSchema = new mongoose.Schema({
         unique: true
 	},
 	groupState: {
-		type: Blob,
+		type: Object,
 		required: true,
-	},
-	date: {
-		type: Date,
-		default: Date.now,
-	},
+	}
 });
 
 const Group = mongoose.model('groups', GroupSchema);
@@ -102,4 +99,4 @@ app.post("/group", async (req, resp) => {
 });
 
 
-app.listen(5000);
+app.listen(process.env.PORT);
