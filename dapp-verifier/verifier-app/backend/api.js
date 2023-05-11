@@ -9,27 +9,6 @@ mongoose.connect(process.env.CONNECTION_URL, {
 }).then(() => console.log('Connected Successfully'))
 .catch((err) => { console.error(err); });
 
-
-// Schema for users of app
-const UserSchema = new mongoose.Schema({
-	name: {
-		type: String,
-		required: true,
-	},
-	email: {
-		type: String,
-		required: true,
-		unique: true,
-	},
-	date: {
-		type: Date,
-		default: Date.now,
-	},
-});
-
-const User = mongoose.model('users', UserSchema);
-User.createIndexes();
-
 // For backend and express
 const express = require('express');
 const app = express();
@@ -47,21 +26,17 @@ app.get("/", (req, resp) => {
 	// backend working properly
 });
 
-app.post("/register", async (req, resp) => {
-	try {
-		const user = new User(req.body);
-		let result = await user.save();
-		result = result.toObject();
-		if (result) {
-			delete result.password;
-			resp.send(req.body);
-			console.log(result);
-		} else {
-			console.log("User already register");
-		}
-
-	} catch (e) {
-		resp.send("Something Went Wrong");
+// Schema for users of app
+const IdentityCommitmentSchema = new mongoose.Schema({
+	groupId: {
+		type: String,
+		required: true,
+        unique: true
+	},
+	// TODO: Can we ensure unique elements in the array?
+	identityCommitments: {
+		type: Array,
+		required: true,
 	}
 });
 
@@ -75,6 +50,60 @@ const GroupSchema = new mongoose.Schema({
 	groupState: {
 		type: Object,
 		required: true,
+	}
+});
+
+const Identities = mongoose.model('identities', IdentityCommitmentSchema);
+Identities.createIndexes();
+
+app.get("/identities", async (req, resp) => {
+	try {
+		const groupId = req.query.groupId.toString();
+		console.log("Received groupId: "+groupId);
+		const group = await Identities.findOne({groupId:groupId});
+
+		if (group) {
+			resp.send(group);
+			console.log("Identities in group sent: "+ group);
+		} else {
+			console.log("Group not found");
+			resp.send("Group not found");
+		}
+	} catch (e) {
+		console.log(e);
+		resp.send("Something Went Wrong"+ e);
+	}
+});
+
+app.post("/identity", async (req, resp) => {
+	try {
+		console.log("Received request");
+		console.log(req.body);
+		const groupId = req.body.groupId.toString();
+		console.log("Group id is: "+ groupId);
+		const identity = req.body.identityCommitment;
+		console.log("Identity commitment to add is: "+ identity);
+		let group = await Identities.findOne({groupId:groupId});
+		if (group) {
+			group.identityCommitments.push(identity);
+		}
+		else {
+			const commitments = [identity];
+			group = new Identities({"groupId":groupId, "identityCommitments":commitments});
+		}
+
+		let result = await group.save();
+		console.log("Saved group");
+		result = result.toObject();
+		if (result) {
+			resp.send(req.body);
+			console.log("Done"+result);
+		} else {
+			console.log("Group state saved");
+		}
+	} catch (e) {
+		console.log(e);
+		resp.send("Something Went Wrong"+ e);
 	}
 });
 
@@ -115,7 +144,6 @@ app.post("/group", async (req, resp) => {
 		} else {
 			console.log("Group state saved");
 		}
-
 	} catch (e) {
 		console.log(e);
 		resp.send("Something Went Wrong"+ e);

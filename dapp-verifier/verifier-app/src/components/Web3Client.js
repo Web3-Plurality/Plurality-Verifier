@@ -15,6 +15,9 @@ let network;
 let isInitialized = false;
 let merkleTreeDepth = 20;
 const signal = formatBytes32String("Hello");
+let group;
+const groupId = process.env.REACT_APP_GROUP_ID;
+
 
 export const init = async () => {
 
@@ -62,20 +65,104 @@ export const init = async () => {
   isInitialized = true;
 };
 
+export const getCurrentGroupState = async (groupId) => {
+  fetch(
+    'http://localhost:5000/identities?groupId='+groupId, {
+        method: "get",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+    .then(json => {
+      console.log("Identity commitments retrieved: "+json.identityCommitments);
+      group = new Group(groupId);
+      group.addMembers(json.identityCommitments);
+      console.log(group.members);
+      return group.members;
+    }).catch(error => {
+      console.log(error);
+    });
+  
+}
+export const addToGroupState = async (groupId, identityCommitment) => {
+  const sendBody = JSON.stringify({ "groupId": groupId, "identityCommitment": identityCommitment });
+  fetch(
+    'http://localhost:5000/identity', {
+        method: "post",
+        body: sendBody,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+    .then(json => {
+      console.log("Identity commitment added:");
+      console.log(json);
+    });
+}
+export const testGroupStorageToDatabase = async () => {
+
+  const groupId = 2;
+  const identity = new Identity();
+  let result;
+  //newGroup.addMember(identity.commitment);
+  
+
+    console.log("Now fetching the group state")
+
+      //result = await result.toString();
+      
+  /*const sendBody = JSON.stringify({ "groupId": groupId, "groupState": newGroup });
+  let result = await fetch(
+    'http://localhost:5000/group', {
+        method: "post",
+        body: sendBody,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    result = await result.toString();
+    console.warn(result);
+    if (result) {
+        alert(result);
+    }
+
+    console.log("Now fetching the group state")
+
+    result = await fetch(
+      'http://localhost:5000/group?groupId='+groupId, {
+          method: "get",
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      })
+      result = await result.toString();
+      console.warn(result);
+      if (result) {
+          alert(result);
+      }*/
+
+}
+export const initGroupState = async () => {
+  //groupId = process.env.REACT_APP_GROUP_ID;
+  console.log(groupId);
+  await getCurrentGroupState(groupId);
+  console.log(group);
+}
 
 export const createGroup = async () => {
     if (!isInitialized) {
       await init();
     }
+    console.log("HERE in createGroup");
+    //await initGroupState();
+    //const min = 1;
+    //const max = 100000;
+    //let rand = min + Math.floor(Math.random() * (max - min));
 
-    const min = 1;
-    const max = 100000;
-    let rand = min + Math.floor(Math.random() * (max - min));
-
-    window.groupId = rand;
-    console.log("Creating group with id: "+ window.groupId);
+    //window.groupId = rand;
+    //console.log("Creating group with id: "+ window.groupId);
     
-    const tx = await semaphoreIdentityContract.methods.createGroup(window.groupId,merkleTreeDepth,signer.address);
+    const tx = await semaphoreIdentityContract.methods.createGroup(groupId,merkleTreeDepth,signer.address);
     const receipt = tx
     .send({
       from: signer.address,
@@ -96,14 +183,16 @@ export const createGroup = async () => {
     if (!isInitialized) {
       await init();
     }
+    await addToGroupState(groupId, identityCommitment);
     identityCommitment = BigInt(identityCommitment);
     console.log("Adding member to group");
     //console.log("Identity commitment: "+identityCommitment);
-    window.group = new Group(window.groupId);
-    window.group.addMember(identityCommitment);
+
+    //window.group = new Group(window.groupId);
+    //window.group.addMember(identityCommitment);
     
     
-    const tx = semaphoreIdentityContract.methods.addMember(window.groupId,identityCommitment);
+    const tx = semaphoreIdentityContract.methods.addMember(groupId,identityCommitment);
     const receipt = await tx
     .send({
       from: signer.address,
