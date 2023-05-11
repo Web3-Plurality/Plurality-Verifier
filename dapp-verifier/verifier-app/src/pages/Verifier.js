@@ -157,7 +157,6 @@ const Verifier = () => {
 
     message = message + `Step 4/4 In Progress: Verifier is now creating the group\n`
     setTextAreaValue(message);
-    console.log("Calling CreateGroup");
 
     createGroup().then(tx => {
       console.log(tx);
@@ -181,10 +180,6 @@ const Verifier = () => {
     });
   }
 
-  /*useEffect(()=>{
-    createUserIdentity();
-  })*/ // <-- empty dependency array, ensures that the function runs only once on load
-
   useEffect(()=>{
     generateQR();
   }, []) // <-- empty dependency array, ensures that the function runs only once on load
@@ -203,7 +198,6 @@ const Verifier = () => {
       },
     );
   }, [text]);
-
     
     return (
         <div class="text-center">

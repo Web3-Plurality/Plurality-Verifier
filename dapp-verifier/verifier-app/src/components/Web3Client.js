@@ -16,11 +16,6 @@ let isInitialized = false;
 let merkleTreeDepth = 20;
 const signal = formatBytes32String("Hello");
 
-export const groupTest = async(identity) => {
-  console.log(window.groupId);
-   window.groupId = 1;
-
-}
 export const init = async () => {
 
   // FOR INFURA
@@ -72,16 +67,16 @@ export const createGroup = async () => {
     if (!isInitialized) {
       await init();
     }
-    console.log("CreateGroup Called");
+
     const min = 1;
     const max = 100000;
     let rand = min + Math.floor(Math.random() * (max - min));
 
     window.groupId = rand;
-    console.log("Creating group with id: "+window.groupId);
+    console.log("Creating group with id: "+ window.groupId);
     
-    const tx = semaphoreIdentityContract.methods.createGroup(window.groupId,merkleTreeDepth,signer.address);
-    const receipt = await tx
+    const tx = await semaphoreIdentityContract.methods.createGroup(window.groupId,merkleTreeDepth,signer.address);
+    const receipt = tx
     .send({
       from: signer.address,
       gas: await tx.estimateGas(),
@@ -90,6 +85,7 @@ export const createGroup = async () => {
       console.log(`Mining transaction ...`);
       console.log(`https://${network}.etherscan.io/tx/${txhash}`);
     });
+
     // The transaction is now on chain!
     console.log(`Mined in block ${receipt.blockNumber}`);
     return receipt;
@@ -108,12 +104,12 @@ export const createGroup = async () => {
     
     
     const tx = semaphoreIdentityContract.methods.addMember(window.groupId,identityCommitment);
-    console.log(tx);
     const receipt = await tx
     .send({
       from: signer.address,
       //TODO: Check why the estimateGas function doesnt work here.
       gas: ethers.utils.parseUnits("9000000", "wei"),
+      //gas: await tx.estimateGas()
     })
     .once("transactionHash", (txhash) => {
       console.log(`Mining transaction ...`);
