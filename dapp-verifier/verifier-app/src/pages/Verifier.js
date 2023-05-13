@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../bootstrap.css';
 import { Identity } from "@semaphore-protocol/identity";
-import { createGroup, addMemberToGroup, testGroupStorageToDatabase } from '../components/Web3Client';
+import { createGroup, addMemberToGroup } from '../components/Web3Client';
 import QRCode from "qrcode";
 import mortgage from '../images/mortgage.png';
 import axios from 'axios'; 
@@ -147,8 +147,6 @@ const Verifier = () => {
     * Verifier adds the public material of the generated identity to the group \n
     * After the above two steps, user will now be able to prove his group membership in zero-knowledge way \n`;
     setTextAreaValue(message);
-    //identityCommitment = identity.commitment;
-    //window.userIdentity = identity;
     await sleep(5000);
     addZkProofToSemaphore();
   }
@@ -198,10 +196,7 @@ const Verifier = () => {
       },
     );
   }, [text]);
-  
-  async function storeGroup() {
-    testGroupStorageToDatabase();
-  }
+
     return (
         <div class="text-center">
           <br/>

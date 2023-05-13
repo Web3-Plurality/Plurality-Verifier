@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import '../bootstrap.css';
-import { verifyMemberIsPartOfGroup } from '../components/Web3Client';
+import { sendGroupStateToPlurality } from '../components/Web3Client';
 import verifiedImg from '../images/verified.png';
 import unverifiedImg from '../images/unverified.png';
 import mortgage from '../images/mortgage.png';
@@ -15,12 +15,16 @@ const DApp = () => {
 
   const logoRef=useRef();
 
-  let message = `Verification Started: User provide zk-proof to the DApp for membership verification with identity commitment ${window.userIdentity.commitment}\n`;
+  let message;
+
+  function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
 
   async function verifyRequestDApp() {
+    message = `Verification Started: User provide zk-proof to the DApp for membership verification\n`;
     setTextAreaValue(message);
-
-    verifyMemberIsPartOfGroup(window.userIdentity).then(tx => {
+    sendGroupStateToPlurality().then(tx => {
       console.log(tx);
       console.log(tx.events.ProofVerified);
       verifyRequestDappTx = tx;

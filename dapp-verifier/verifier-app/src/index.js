@@ -10,9 +10,9 @@ import { Identity } from "@semaphore-protocol/identity";
 
 
 //TODO: Change the storage of groups and identities to a persistent storage or database
-window.group = new Group(0);
-window.groupId = 0;
-window.userIdentity = new Identity();
+//window.group = new Group(0);
+//window.groupId = 0;
+//window.userIdentity = new Identity();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
