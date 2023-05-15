@@ -8,19 +8,16 @@ import { formatBytes32String } from "ethers/lib/utils"
 import { ethers } from "ethers";
 import { sleep } from "../utils/SleepUtil";
 
-
 let selectedAccount;
 let semaphoreIdentityContract;
 let signer;
 let network;
 let isInitialized = false;
 let merkleTreeDepth = 20;
-//const signal = formatBytes32String("Hello");
 const signal = 1;
 let group;
 let identityCommitmentsList;
 const groupId = process.env.REACT_APP_GROUP_ID;
-
 
 export const init = async () => {
 
@@ -37,7 +34,6 @@ export const init = async () => {
     process.env.REACT_APP_SIGNER_PRIVATE_KEY
   );
   web3.eth.accounts.wallet.add(signer);
-
   console.log(SemaphoreIdentity.abi);
   semaphoreIdentityContract = new web3.eth.Contract(SemaphoreIdentity.abi,process.env.REACT_APP_SEMAPHORE_IDENTITY_CONTRACT); //contract address at sepolia
   console.log(semaphoreIdentityContract);
@@ -45,6 +41,8 @@ export const init = async () => {
 };
 
 export const getCurrentGroupState = async () => {
+
+  //TODO: Check if the current identity commitment is already in db
   await fetch(
     process.env.REACT_APP_API_BASE_URL+'/identities?groupId='+groupId, {
         method: "get",
@@ -85,9 +83,11 @@ export const createGroup = async () => {
     if (!isInitialized) {
       await init();
     }
-    semaphoreIdentityContract.methods.groups(groupId).call({ from: process.env.REACT_APP_SEMAPHORE_IDENTITY_CONTRACT }, async function (error, result) {
-      console.log(result);
-      if (result[0] === "0x0000000000000000000000000000000000000000")
+    console.log("Checking if the group id already exists on chain");
+    const doesGroupExist = await semaphoreIdentityContract.methods.groups(groupId).call({ from: process.env.REACT_APP_SEMAPHORE_IDENTITY_CONTRACT });
+    console.log("Does Group Exist?");
+    console.log(doesGroupExist);
+    if (doesGroupExist[0] === "0x0000000000000000000000000000000000000000")
       {
         console.log("Group does not exist on chain. Creating now");
         const tx = await semaphoreIdentityContract.methods.createGroup(groupId,merkleTreeDepth,signer.address);
@@ -106,11 +106,9 @@ export const createGroup = async () => {
         return receipt;
       }
       else {
-        console.log("Group exists on chain. Not creating on chain");
-        return "";
+        console.log("Group already exists on chain so not creating again");
+        return "GROUP_ALREADY_EXISTS";
       }
-    });
-    
   };
 
   export const addMemberToGroup = async (identityCommitment) => {
@@ -118,16 +116,23 @@ export const createGroup = async () => {
       await init();
     }
     await addToGroupState(groupId, identityCommitment);
-    identityCommitment = BigInt(identityCommitment);
+    console.log(typeof(identityCommitment));
+    //identityCommitment = BigInt(identityCommitment);
+    console.log(typeof(identityCommitment));
+
     console.log("Adding member to group");
     
+    console.log("groupId: "+ groupId);
+    console.log("identityCommitment: "+ identityCommitment);
+
     const tx = semaphoreIdentityContract.methods.addMember(groupId,identityCommitment);
+    
     const receipt = await tx
     .send({
       from: signer.address,
       //TODO: Check why the estimateGas function doesnt work here.
       gas: ethers.utils.parseUnits("9100000", "wei"),
-      //gas: await tx.estimateGas()
+      //gas: await tx.estimateGas(),
     })
     .once("transactionHash", (txhash) => {
       console.log(`Mining addMemberToGroup transaction ...`);
@@ -206,11 +211,10 @@ export const createGroup = async () => {
 
     const tx = semaphoreIdentityContract.methods
               .verifyProof(groupId, fullProof.merkleTreeRoot, signal, fullProof.nullifierHash, groupId, fullProof.proof);
+
     const receipt = await tx
     .send({
       from: signer.address,
-      //TODO: Check why the estimateGas function doesnt work here.
-      //gas: ethers.utils.parseUnits("9000000", "wei"),
       gas: await tx.estimateGas()    
     })
     .once("transactionHash", (txhash) => {
@@ -238,8 +242,6 @@ export const createGroup = async () => {
     if (!isInitialized) {
       await init();
     }
-    //group.addMember(identity.commitment);
-    //TODO: Test with merkel proof instead of group
 
     const fullProof = await generateProof(identity, window.group, window.groupId, signal);
 

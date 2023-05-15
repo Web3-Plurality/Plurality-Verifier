@@ -40,38 +40,6 @@ const DApp = () => {
       setTextAreaValue(message);
       imageRef.current.src=unverifiedImg;
     }
-
-    /*sendGroupStateToPlurality().then(tx => {
-      console.log(tx);
-      /*console.log(tx.events.ProofVerified);
-      verifyRequestDappTx = tx;
-      message = message + `Verification In Progress: Your zero knowledge proof is being checked against the contract.\n`; 
-      setTextAreaValue(message);
-      try {
-        if (verifyRequestDappTx.events.ProofVerified)
-        {
-          message = message + 'Verification Complete. Access GRANTED. Your proof was valid. \n'; 
-          setTextAreaValue(message);
-          imageRef.current.src=verifiedImg;
-        }
-        else {
-          message = message + 'Verification Complete. Access DENIED. You are not a part of valid participants \n' 
-          setTextAreaValue(message);
-          imageRef.current.src=unverifiedImg;
-        }
-      }
-      catch(err) {
-        message = message + 'Verification Complete. Access DENIED. You are not a part of valid participants \n' 
-        setTextAreaValue(message);
-        imageRef.current.src=unverifiedImg;
-      }
-    }).catch(err => {
-      console.log(err);
-      verifyRequestDappTx = err;
-      message = message + `Your zero knowledge proof is invalid. Access DENIED`; 
-      setTextAreaValue(message);
-      imageRef.current.src=unverifiedImg;
-    });*/
   }
 
 
@@ -91,7 +59,7 @@ const DApp = () => {
           <img ref={imageRef} src={pending} alt={"None"} style={{width: '200px', height: '200px'}} />
 
           <div className="mb-3" id="textarea-readonly">
-            <textarea className="form-control" id="exampleFormControlTextarea1" rows="12" value={textAreaValue} aria-label="Disabled input example" disabled readonly></textarea>
+            <textarea className="form-control" id="exampleFormControlTextarea1" rows="12" value={textAreaValue} aria-label="Disabled input example" disabled readOnly></textarea>
           </div>
         </div>
       );

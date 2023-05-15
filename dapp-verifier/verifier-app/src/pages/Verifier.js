@@ -151,7 +151,23 @@ const Verifier = () => {
     message = message + `Step 4/4 In Progress: Verifier is now creating the group\n`
     setTextAreaValue(message);
 
-    createGroup().then(tx => {
+    try {
+      const groupCreationReceipt = await createGroup();
+      console.log(groupCreationReceipt);
+      message = message + `Group creation complete. Verifier is now adding member to group with commitment: ${identityCommitment} \n`
+      setTextAreaValue(message);
+
+      const memberAdditionReceipt = await addMemberToGroup(identityCommitment);
+      console.log(memberAdditionReceipt);
+      message = message + `Step 4/4 Complete: User added to group. \n User can now request the DApp for verification by submitting a zero knowledge proof of membership of a group\n` 
+      setTextAreaValue(message);
+    } catch (err) {
+      console.log(err);
+      message = message + "An error occured while creating a group\n";
+      setTextAreaValue(message)
+    }
+
+    /*createGroup().then(tx => {
       console.log(tx);
       message = message + `Group creation complete. Verifier is now adding member to group with commitment: ${identityCommitment} \n`
       setTextAreaValue(message);
@@ -170,7 +186,7 @@ const Verifier = () => {
       console.log(err);
       message = message + "An error occured while creating a group\n";
       setTextAreaValue(message)
-    });
+    });*/
   }
 
   useEffect(()=>{
