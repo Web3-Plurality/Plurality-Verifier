@@ -1,12 +1,10 @@
 import React, { useRef, useState } from 'react';
 import '../bootstrap.css';
-import { sendGroupStateToPlurality } from '../components/Web3Client';
+import { sendGroupStateToPlurality } from '../utils/Web3Client';
 import verifiedImg from '../images/verified.png';
 import unverifiedImg from '../images/unverified.png';
 import mortgage from '../images/mortgage.png';
 import pending from '../images/pending.png';
-
-let verifyRequestDappTx;
 
 const DApp = () => {
   const [textAreaValue, setTextAreaValue] = useState('');
@@ -35,7 +33,6 @@ const DApp = () => {
       }
     } catch(err) {
       console.log(err);
-      verifyRequestDappTx = err;
       message = message + `Your zero knowledge proof is invalid. Access DENIED`; 
       setTextAreaValue(message);
       imageRef.current.src=unverifiedImg;

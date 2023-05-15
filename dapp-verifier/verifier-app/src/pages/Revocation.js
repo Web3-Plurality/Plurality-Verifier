@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
 import '../bootstrap.css';
-import { removeMemberFromGroup } from '../components/Web3Client';
+import { removeMemberFromGroup } from '../utils/Web3Client';
 import mortgage from '../images/mortgage.png';
 
 
+// TODO: Complete revocation workflow 
 const Revocation = () => {
   const [textAreaValue, setTextAreaValue] = useState('');
 
@@ -11,6 +12,7 @@ const Revocation = () => {
 
   let message = `Revoking user access from dapp that has identity commitment ${window.userIdentity.commitment} \n`;
 
+  // TODO: For revocation, remove from database and then also from smart contract
   async function revokeAccess() {
     setTextAreaValue(message);
     removeMemberFromGroup(window.userIdentity.commitment).then(tx => {

@@ -4,9 +4,8 @@ import Web3 from 'web3'
 import SemaphoreIdentity from '../SemaphoreIdentity.json';
 import { Group } from "@semaphore-protocol/group"
 import { generateProof } from "@semaphore-protocol/proof"
-import { formatBytes32String } from "ethers/lib/utils"
 import { ethers } from "ethers";
-import { sleep } from "../utils/SleepUtil";
+import { fetchVerificationProofFromExtension } from "./ExtensionUtil";
 
 let selectedAccount;
 let semaphoreIdentityContract;
@@ -117,7 +116,7 @@ export const createGroup = async () => {
     }
     await addToGroupState(groupId, identityCommitment);
     console.log(typeof(identityCommitment));
-    //identityCommitment = BigInt(identityCommitment);
+    identityCommitment = BigInt(identityCommitment);
     console.log(typeof(identityCommitment));
 
     console.log("Adding member to group");
@@ -144,27 +143,6 @@ export const createGroup = async () => {
     return receipt;
   };
 
-  export const removeMemberFromGroup = async (identityCommitment) => {
-    if (!isInitialized) {
-      await init();
-    }
-    
-    const index = window.group.indexOf(identityCommitment) // 0
-    console.log(index);
-    const merkelProof = await window.group.generateMerkleProof(index);  
-    console.log(merkelProof);  
-    const proofPath = merkelProof.pathIndices;
-    console.log(proofPath);
-    const proofSiblings = merkelProof.siblings;
-    console.log(proofSiblings);
-    //window.group.removeMember(index);
-
-    //TODO: Fix the tx as per infura syntax
-    return semaphoreIdentityContract.methods
-      .removeMember(window.groupId,identityCommitment, proofSiblings, proofPath)
-      .send({from: selectedAccount})
-  };
-
   export const sendGroupStateToPlurality = async () => {
 
     if (!isInitialized) {
@@ -180,17 +158,8 @@ export const createGroup = async () => {
     console.log("Dispatching event for proof request with obj");
     console.log(obj);
 
-    localStorage.setItem("fullProof","");
-    document.dispatchEvent(new CustomEvent('receive_proof_request_from_web_page', {detail: obj}));
-
-    let fullProof = localStorage.getItem("fullProof");
-    // wait until the user finishes up generating proof in extension
-    while (fullProof === "")
-    {
-      await sleep (5000);
-      fullProof = localStorage.getItem("fullProof");
-    }
-    fullProof = JSON.parse(fullProof);
+    let fullProof = await fetchVerificationProofFromExtension(obj);
+    
     const receipt = await verifyZKProofSentByUser(fullProof);
     console.log("Receipt is: ");
     console.log(receipt);
@@ -255,3 +224,24 @@ export const createGroup = async () => {
       .send({from: selectedAccount})
   };
 
+  // TODO: Fix the revocation workflow and this function
+  export const removeMemberFromGroup = async (identityCommitment) => {
+    if (!isInitialized) {
+      await init();
+    }
+    
+    const index = window.group.indexOf(identityCommitment) // 0
+    console.log(index);
+    const merkelProof = await window.group.generateMerkleProof(index);  
+    console.log(merkelProof);  
+    const proofPath = merkelProof.pathIndices;
+    console.log(proofPath);
+    const proofSiblings = merkelProof.siblings;
+    console.log(proofSiblings);
+    //window.group.removeMember(index);
+
+    //TODO: Fix the tx as per infura syntax
+    return semaphoreIdentityContract.methods
+      .removeMember(window.groupId,identityCommitment, proofSiblings, proofPath)
+      .send({from: selectedAccount})
+  };

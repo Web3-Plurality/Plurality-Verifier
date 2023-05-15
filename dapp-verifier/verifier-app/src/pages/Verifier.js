@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../bootstrap.css';
-import { createGroup, addMemberToGroup } from '../components/Web3Client';
+import { createGroup, addMemberToGroup } from '../utils/Web3Client';
 import QRCode from "qrcode";
 import mortgage from '../images/mortgage.png';
 import axios from 'axios'; 
 import { encode } from "base-64";
 import { sleep } from "../utils/SleepUtil";
-
+import { fetchIdentityCommitmentFromExtension } from '../utils/ExtensionUtil';
 const Verifier = () => {
   const [text, setText] = useState("");
 
@@ -120,20 +120,7 @@ const Verifier = () => {
   }
 
   async function createUserIdentity() {
-
-    localStorage.setItem("commitment", "");
-    document.dispatchEvent(new CustomEvent('receive_identity_request_from_web_page', {detail: "Plurality Verifier - Test dApp Proof "}));
-
-    identityCommitment = localStorage.getItem("commitment");
-
-    // wait until the user finishes up creating identity in extension
-    while (identityCommitment === "")
-    {
-      await sleep (5000);
-      identityCommitment = localStorage.getItem("commitment");
-    }
-
-    identityCommitment = JSON.parse(identityCommitment);
+    identityCommitment = await fetchIdentityCommitmentFromExtension();
     
     message = message + `Step 3/4 Complete: Your identity material has been generated inside the extension. Please keep it safe and private \n
     Public Commitment shared by the extension is: ${identityCommitment} \n \n
@@ -166,27 +153,6 @@ const Verifier = () => {
       message = message + "An error occured while creating a group\n";
       setTextAreaValue(message)
     }
-
-    /*createGroup().then(tx => {
-      console.log(tx);
-      message = message + `Group creation complete. Verifier is now adding member to group with commitment: ${identityCommitment} \n`
-      setTextAreaValue(message);
-      // add member to group
-      addMemberToGroup(identityCommitment).then(tx => {
-        console.log(tx);
-        message = message + `Step 4/4 Complete: User added to group. \n User can now request the DApp for verification by submitting a zero knowledge proof of membership of a group\n` 
-        setTextAreaValue(message);
-      }).catch(err => {
-        console.log(err);
-        message = message + "An error occured while adding member to the group\n";
-        setTextAreaValue(message);
-      }); 
-      
-    }).catch(err => {
-      console.log(err);
-      message = message + "An error occured while creating a group\n";
-      setTextAreaValue(message)
-    });*/
   }
 
   useEffect(()=>{
