@@ -9,13 +9,13 @@ const Navbar = () => {
           {/*<NavLink to="/" activeStyle>
             Zero Knowledge Semaphore Demo
   </NavLink>*/}
-          <NavLink to="/verifier" activeStyle>
+          <NavLink to="/verifier">
             Verifier
           </NavLink>
-          <NavLink to="/dapp" activeStyle>
+          <NavLink to="/dapp">
             DApp
           </NavLink>
-          <NavLink to="/revocation" activeStyle>
+          <NavLink to="/revocation">
             Revocation
           </NavLink>
         </NavMenu>

@@ -116,13 +116,13 @@ const SemaphoreDemo = () => {
         <h1 class="display-4 text-center">Zero Knowledge based Identity Verification Layer Demo </h1>
       </div>
       <div class="text-center">
-        <button onClick={generateIdMaterial} type="button" class="btn btn-primary me-md-2" disabled={isGenerateIdMaterialDisabled} data-bs-toggle="button" autocomplete="off" aria-pressed="true">Generate Identity Material</button>
-        <button onClick={addZkProofToSemaphore} type="button" class="btn btn-primary me-md-2" disabled={isAddZkProofToSemaphoreDisabled} data-bs-toggle="button" autocomplete="off">Verifier Adds User-ZK-Proof to Blockchain</button>
-        <button onClick={verifyRequestDApp} type="button" class="btn btn-primary me-md-2" disabled={isVerifyRequestDAppDisabled} data-bs-toggle="button" autocomplete="off">User Requests the DApp for membership verification</button>
-        <button onClick={checkVerificationStatus} type="button" class="btn btn-primary me-md-2" disabled={isCheckVerificationStatusDisabled} data-bs-toggle="button" autocomplete="off">Check Verification Status at DApp Contract</button>
+        <button onClick={generateIdMaterial} type="button" class="btn btn-primary me-md-2" disabled={isGenerateIdMaterialDisabled} data-bs-toggle="button" autoComplete="off" aria-pressed="true">Generate Identity Material</button>
+        <button onClick={addZkProofToSemaphore} type="button" class="btn btn-primary me-md-2" disabled={isAddZkProofToSemaphoreDisabled} data-bs-toggle="button" autoComplete="off">Verifier Adds User-ZK-Proof to Blockchain</button>
+        <button onClick={verifyRequestDApp} type="button" class="btn btn-primary me-md-2" disabled={isVerifyRequestDAppDisabled} data-bs-toggle="button" autoComplete="off">User Requests the DApp for membership verification</button>
+        <button onClick={checkVerificationStatus} type="button" class="btn btn-primary me-md-2" disabled={isCheckVerificationStatusDisabled} data-bs-toggle="button" autoComplete="off">Check Verification Status at DApp Contract</button>
       </div>
       <div class="text-center">
-        <button onClick={removeMemberFromSmartContract} type="button" class="btn btn-primary me-md-2" disabled={isRemoveMemberFromGroupDisabled} data-bs-toggle="button" autocomplete="off">Revoke User Access From Group</button>
+        <button onClick={removeMemberFromSmartContract} type="button" class="btn btn-primary me-md-2" disabled={isRemoveMemberFromGroupDisabled} data-bs-toggle="button" autoComplete="off">Revoke User Access From Group</button>
       </div>
       <div class="mb-3" id="textarea-readonly">
         <textarea class="form-control" id="exampleFormControlTextarea1" rows="12" value={textAreaValue} aria-label="Disabled input example" disabled readonly></textarea>

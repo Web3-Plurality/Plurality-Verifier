@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import '../bootstrap.css';
-import { Identity } from "@semaphore-protocol/identity";
 import { createGroup, addMemberToGroup } from '../components/Web3Client';
 import QRCode from "qrcode";
 import mortgage from '../images/mortgage.png';
 import axios from 'axios'; 
 import { encode } from "base-64";
+import { sleep } from "../utils/SleepUtil";
 
 const Verifier = () => {
   const [text, setText] = useState("");
@@ -17,7 +17,6 @@ const Verifier = () => {
 
   let partnerId;
   let connectionId;
-  let identity;
   let identityCommitment;
   let message;
   const proofTemplateId = "ecfacbf5-c75b-4867-bcf6-9258ede36525";
@@ -45,10 +44,6 @@ const Verifier = () => {
       message = message + 'There was an error!'+ error + '\n'; 
       console.error(message);
     });
-  }
-
-  function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async function waitForAcceptance() {
@@ -198,23 +193,23 @@ const Verifier = () => {
   }, [text]);
 
     return (
-        <div class="text-center">
+        <div className="text-center">
           <br/>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center"}}>
             <img src={mortgage} ref={logoRef} alt={"None"} style={{width: '50px', height: '50px' }} />
-            <h1 class="display-6 text-center"> &nbsp; Verifier for Mortgage Loans DApp</h1>
+            <h1 className="display-6 text-center"> &nbsp; Verifier for Mortgage Loans DApp</h1>
           </div>
           <br/>
-          <h4 class="text-center">Scan the QR code to connect to verifier and provide proof details</h4>
+          <h4 className="text-center">Scan the QR code to connect to verifier and provide proof details</h4>
           <p>Proof Required: Information from Identity Card  </p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center"}}>
             <canvas ref={canvasRef}  />
           </div>
           {/*<p>Connection Url: {text}</p>*/}
           {/*TODO: Change this click back to generateQR */}
-          <button onClick={createUserIdentity} type="button" class="btn btn-primary me-md-2" data-bs-toggle="button">Generate New Proof Invitation</button>
+          <button onClick={createUserIdentity} type="button" className="btn btn-primary me-md-2" data-bs-toggle="button">Generate New Proof Invitation</button>
           <br/> <br/>
-          <textarea class="form-control" rows="12" value={textAreaValue} aria-label="Disabled input example" disabled readonly></textarea>
+          <textarea className="form-control" rows="12" value={textAreaValue} aria-label="Disabled input example" disabled readOnly></textarea>
         </div>
       );
 }

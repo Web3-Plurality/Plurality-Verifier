@@ -31,7 +31,7 @@ const Revocation = () => {
           <br />
           <h4>One of the verified users no longer satisfies the proof criteria? Use this page to revoke access</h4>
           <br/>
-          <button onClick={revokeAccess} type="button" class="btn btn-primary me-md-2" data-bs-toggle="button" autocomplete="off">Revoke Access For User</button>
+          <button onClick={revokeAccess} type="button" class="btn btn-primary me-md-2" data-bs-toggle="button" autoComplete="off">Revoke Access For User</button>
           <br/> <br/><br/>
           <div class="mb-3" id="textarea-readonly">
             <textarea class="form-control" id="exampleFormControlTextarea1" rows="12" value={textAreaValue} aria-label="Disabled input example" disabled readonly></textarea>

@@ -6,7 +6,8 @@ import { Group } from "@semaphore-protocol/group"
 import { generateProof } from "@semaphore-protocol/proof"
 import { formatBytes32String } from "ethers/lib/utils"
 import { ethers } from "ethers";
-import { Identity } from "@semaphore-protocol/identity";
+import { sleep } from "../utils/SleepUtil";
+
 
 let selectedAccount;
 let semaphoreIdentityContract;
@@ -14,7 +15,8 @@ let signer;
 let network;
 let isInitialized = false;
 let merkleTreeDepth = 20;
-const signal = formatBytes32String("Hello");
+//const signal = formatBytes32String("Hello");
+const signal = 1;
 let group;
 let identityCommitmentsList;
 const groupId = process.env.REACT_APP_GROUP_ID;
@@ -56,8 +58,6 @@ export const getCurrentGroupState = async () => {
       console.log(json.identityCommitments.length);
       group = new Group(groupId);
       group.addMembers(json.identityCommitments);
-      //console.log(group.members);
-      //console.log(group.members.length);
       return group.members;
     }).catch(error => {
       console.log(error);
@@ -76,7 +76,7 @@ export const addToGroupState = async (groupId, identityCommitment) => {
         }
     }).then(response => response.json())
     .then(json => {
-      console.log("Identity commitment added:");
+      console.log("Identity commitment added to database:");
       console.log(json);
     });
 }
@@ -97,12 +97,12 @@ export const createGroup = async () => {
         gas: await tx.estimateGas(),
         })
         .once("transactionHash", (txhash) => {
-          console.log(`Mining transaction ...`);
+          console.log(`Mining createGroup transaction ...`);
           console.log(`https://${network}.etherscan.io/tx/${txhash}`);
         });
 
         // The transaction is now on chain!
-        console.log(`Mined in block ${receipt.blockNumber}`);
+        console.log(`createGroup Mined in block ${receipt.blockNumber}`);
         return receipt;
       }
       else {
@@ -126,15 +126,15 @@ export const createGroup = async () => {
     .send({
       from: signer.address,
       //TODO: Check why the estimateGas function doesnt work here.
-      gas: ethers.utils.parseUnits("9000000", "wei"),
+      gas: ethers.utils.parseUnits("9100000", "wei"),
       //gas: await tx.estimateGas()
     })
     .once("transactionHash", (txhash) => {
-      console.log(`Mining transaction ...`);
+      console.log(`Mining addMemberToGroup transaction ...`);
       console.log(`https://${network}.etherscan.io/tx/${txhash}`);
     });
     // The transaction is now on chain!
-    console.log(`Mined in block ${receipt.blockNumber}`);
+    console.log(`addMemberToGroup Mined in block ${receipt.blockNumber}`);
     
     return receipt;
   };
@@ -167,7 +167,6 @@ export const createGroup = async () => {
     }
     await getCurrentGroupState();
 
-
     var obj = {
       title: "Plurality Verifier - Test dApp Proof ", 
       identityCommitments: identityCommitmentsList, 
@@ -175,8 +174,62 @@ export const createGroup = async () => {
     }
     console.log("Dispatching event for proof request with obj");
     console.log(obj);
+
+    localStorage.setItem("fullProof","");
     document.dispatchEvent(new CustomEvent('receive_proof_request_from_web_page', {detail: obj}));
 
+    let fullProof = localStorage.getItem("fullProof");
+    // wait until the user finishes up generating proof in extension
+    while (fullProof === "")
+    {
+      await sleep (5000);
+      fullProof = localStorage.getItem("fullProof");
+    }
+    fullProof = JSON.parse(fullProof);
+    const receipt = await verifyZKProofSentByUser(fullProof);
+    console.log("Receipt is: ");
+    console.log(receipt);
+    return receipt;
+  };
+
+  export const verifyZKProofSentByUser = async (fullProof) => {
+
+    if (!isInitialized) {
+      await init();
+    }
+    console.log("Sending proof to SC: "+ fullProof);
+    console.log("GroupId: "+groupId);
+    console.log("MerkleTreeRoot: "+fullProof.merkleTreeRoot);
+    console.log("Signal: "+signal);
+    console.log("NullifierHash: "+fullProof.nullifierHash);
+    console.log("Proof: "+fullProof.proof);
+
+    const tx = semaphoreIdentityContract.methods
+              .verifyProof(groupId, fullProof.merkleTreeRoot, signal, fullProof.nullifierHash, groupId, fullProof.proof);
+    const receipt = await tx
+    .send({
+      from: signer.address,
+      //TODO: Check why the estimateGas function doesnt work here.
+      //gas: ethers.utils.parseUnits("9000000", "wei"),
+      gas: await tx.estimateGas()    
+    })
+    .once("transactionHash", (txhash) => {
+      console.log(`Mining verifyZKProofSentByUser transaction ...`);
+      console.log(`https://${network}.etherscan.io/tx/${txhash}`);
+    });
+    // The transaction is now on chain!
+    console.log(`verifyZKProofSentByUser Mined in block ${receipt.blockNumber}`);
+    
+    if (receipt.events.ProofVerified) 
+    {
+      console.log("Proof is valid. Returning true");
+      return true;
+    }
+    else 
+    {
+      console.log("Proof is invalid. Returning false");
+      return false;
+    }
   };
 
   export const verifyMemberIsPartOfGroup = async (identity) => {
