@@ -18,6 +18,10 @@ let group;
 let identityCommitmentsList;
 const groupId = process.env.REACT_APP_GROUP_ID;
 
+export const initMetamask = async () => {
+};
+
+
 export const init = async () => {
 
   // FOR INFURA
@@ -143,6 +147,25 @@ export const createGroup = async () => {
     return receipt;
   };
 
+  export const requestPersonalSignOnProof = async (fullProof: any) => {
+    console.log("In personal sign");
+    try {
+      if (!window.ethereum)
+        throw new Error("No crypto wallet found. Please install it");
+      
+      await window.ethereum.request({method: 'eth_requestAccounts' });
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = await provider.getSigner();
+      const signature = await signer.signMessage(JSON.stringify(fullProof));
+      const address = await signer.getAddress();
+      console.log(`Message was signed by the address ${address}`);
+      return address;
+    }
+    catch (err) {
+      console.log(err);
+    }
+  }
+
   export const sendGroupStateToPlurality = async () => {
 
     if (!isInitialized) {
@@ -160,6 +183,10 @@ export const createGroup = async () => {
 
     let fullProof = await fetchVerificationProofFromExtension(obj);
     
+    const proverEthAddress = await requestPersonalSignOnProof(fullProof);
+
+    // TODO: Store in database the address which signed the proof along with identity commitment and submitted proof
+
     const receipt = await verifyZKProofSentByUser(fullProof);
     console.log("Receipt is: ");
     console.log(receipt);

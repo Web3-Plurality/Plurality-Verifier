@@ -154,7 +154,7 @@ const Verifier = () => {
       setTextAreaValue(message)
     }
   }
-
+ 
   useEffect(()=>{
     generateQR();
   }, []) // <-- empty dependency array, ensures that the function runs only once on load
