@@ -19,6 +19,8 @@ let identityCommitmentsList;
 const groupId = process.env.REACT_APP_GROUP_ID;
 
 
+// TODO: Separate out the functions in this util into 3 files: database calls, personal sign call, and semaphore function calls
+
 export const init = async () => {
 
   // FOR INFURA
@@ -67,6 +69,22 @@ export const addToGroupState = async (groupId, identityCommitment) => {
   const sendBody = JSON.stringify({ "groupId": groupId, "identityCommitment": identityCommitment });
   await fetch(
     process.env.REACT_APP_API_BASE_URL+'/group', {
+        method: "post",
+        body: sendBody,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }).then(response => response.json())
+    .then(json => {
+      console.log("Identity commitment added to database:");
+      console.log(json);
+    });
+}
+
+export const addVerifiedIdentity = async (identityCommitment, blockchainAddress, fullProof) => {
+  const sendBody = JSON.stringify({ "commitment": identityCommitment, "blockchainAddress": blockchainAddress, "zkProof": JSON.stringify(fullProof) });
+  await fetch(
+    process.env.REACT_APP_API_BASE_URL+'/identity', {
         method: "post",
         body: sendBody,
         headers: {
@@ -178,14 +196,13 @@ export const createGroup = async () => {
     console.log("Dispatching event for proof request with obj");
     console.log(obj);
 
-    let fullProof = await fetchVerificationProofFromExtension(obj);
-    
+    let { fullProof, identityCommitment } = await fetchVerificationProofFromExtension(obj);
+    console.log("Full proof is: "+ fullProof);
+    console.log("Identity commitment is: "+ identityCommitment);
     const proverEthAddress = await requestPersonalSignOnProof(fullProof);
 
-    // TODO: Store in database the address which signed the proof along with identity commitment and submitted proof
-    // need to store proverEthAddress, fullProof, and also need to return the identityCommitment used to generate the proof from the function fetchVerificationProofFromExtension
-    // all this then needs to be stored in the database
-
+    // need to store in the database which identity commitment corresponds to which blockchain address and which zk proof
+    await addVerifiedIdentity(identityCommitment, proverEthAddress, fullProof);
     
     const receipt = await verifyZKProofSentByUser(fullProof);
     console.log("Receipt is: ");
@@ -230,25 +247,6 @@ export const createGroup = async () => {
       console.log("Proof is invalid. Returning false");
       return false;
     }
-  };
-
-  export const verifyMemberIsPartOfGroup = async (identity) => {
-    console.log(`HERE ${identity}`);
-
-    if (!isInitialized) {
-      await init();
-    }
-
-    const fullProof = await generateProof(identity, window.group, window.groupId, signal);
-
-    console.log(`MerkleTreeRoot: ${fullProof.merkleTreeRoot} \n
-    NullifierHash: ${fullProof.nullifierHash} \n
-    ExternalNullifier: ${fullProof.externalNullifier} \n
-    Proof: ${fullProof.proof}`)
-
-    return semaphoreIdentityContract.methods
-      .verifyProof(window.groupId, fullProof.merkleTreeRoot, signal, fullProof.nullifierHash, window.groupId, fullProof.proof)
-      .send({from: selectedAccount})
   };
 
   // TODO: Fix the revocation workflow and this function
