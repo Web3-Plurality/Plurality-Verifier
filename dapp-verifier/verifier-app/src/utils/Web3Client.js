@@ -2,24 +2,19 @@
 
 import Web3 from 'web3'
 import SemaphoreIdentity from '../SemaphoreIdentity.json';
-import { Group } from "@semaphore-protocol/group"
-import { generateProof } from "@semaphore-protocol/proof"
 import { ethers } from "ethers";
 import { fetchVerificationProofFromExtension } from "./ExtensionUtil";
+import { getCurrentGroupState, addToGroupState, addVerifiedIdentity } from "./VerifierAPIUtil";
+import { requestPersonalSignOnProof } from "./PersonalSignUtil";
 
-let selectedAccount;
+
 let semaphoreIdentityContract;
 let signer;
 let network;
 let isInitialized = false;
 let merkleTreeDepth = 20;
 const signal = 1;
-let group;
-let identityCommitmentsList;
 const groupId = process.env.REACT_APP_GROUP_ID;
-
-
-// TODO: Separate out the functions in this util into 3 files: database calls, personal sign call, and semaphore function calls
 
 export const init = async () => {
 
@@ -42,60 +37,7 @@ export const init = async () => {
   isInitialized = true;
 };
 
-export const getCurrentGroupState = async () => {
 
-  //TODO: Check if the current identity commitment is already in db
-  await fetch(
-    process.env.REACT_APP_API_BASE_URL+'/group/'+groupId, {
-        method: "get",
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => response.json())
-    .then(json => {
-      identityCommitmentsList = json.identityCommitments;
-      console.log("Identity commitments retrieved from database: "+json.identityCommitments);
-      console.log(json.identityCommitments.length);
-      group = new Group(groupId);
-      group.addMembers(json.identityCommitments);
-      return group.members;
-    }).catch(error => {
-      console.log(error);
-      return error;
-    });
-  
-}
-export const addToGroupState = async (groupId, identityCommitment) => {
-  const sendBody = JSON.stringify({ "groupId": groupId, "identityCommitment": identityCommitment });
-  await fetch(
-    process.env.REACT_APP_API_BASE_URL+'/group', {
-        method: "post",
-        body: sendBody,
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => response.json())
-    .then(json => {
-      console.log("Identity commitment added to database:");
-      console.log(json);
-    });
-}
-
-export const addVerifiedIdentity = async (identityCommitment, blockchainAddress, fullProof) => {
-  const sendBody = JSON.stringify({ "commitment": identityCommitment, "blockchainAddress": blockchainAddress, "zkProof": JSON.stringify(fullProof) });
-  await fetch(
-    process.env.REACT_APP_API_BASE_URL+'/identity', {
-        method: "post",
-        body: sendBody,
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    }).then(response => response.json())
-    .then(json => {
-      console.log("Identity commitment added to database:");
-      console.log(json);
-    });
-}
 
 export const createGroup = async () => {
     if (!isInitialized) {
@@ -162,31 +104,12 @@ export const createGroup = async () => {
     return receipt;
   };
 
-  export const requestPersonalSignOnProof = async (fullProof: any) => {
-    console.log("In personal sign");
-    try {
-      if (!window.ethereum)
-        throw new Error("No crypto wallet found. Please install it");
-      
-      await window.ethereum.request({method: 'eth_requestAccounts' });
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = await provider.getSigner();
-      const signature = await signer.signMessage(JSON.stringify(fullProof));
-      const address = await signer.getAddress();
-      console.log(`Message was signed by the address ${address}`);
-      return address;
-    }
-    catch (err) {
-      console.log(err);
-    }
-  }
-
   export const sendGroupStateToPlurality = async () => {
 
     if (!isInitialized) {
       await init();
     }
-    await getCurrentGroupState();
+    let identityCommitmentsList = await getCurrentGroupState();
 
     var obj = {
       title: "Plurality Verifier - Test dApp Proof ", 
@@ -255,7 +178,8 @@ export const createGroup = async () => {
       await init();
     }
     
-    const index = window.group.indexOf(identityCommitment) // 0
+    // NOT WORKING
+    /*const index = window.group.indexOf(identityCommitment) // 0
     console.log(index);
     const merkelProof = await window.group.generateMerkleProof(index);  
     console.log(merkelProof);  
@@ -268,5 +192,5 @@ export const createGroup = async () => {
     //TODO: Fix the tx as per infura syntax
     return semaphoreIdentityContract.methods
       .removeMember(window.groupId,identityCommitment, proofSiblings, proofPath)
-      .send({from: selectedAccount})
+      .send({from: selectedAccount})*/
   };
