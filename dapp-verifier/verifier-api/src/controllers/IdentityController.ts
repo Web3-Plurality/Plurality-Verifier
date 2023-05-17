@@ -53,7 +53,7 @@ identityRouter.get("/blockchainaddress/:bcAddress", async (req: Request, res: Re
 		console.log("Received request");
 		console.log(req.body);
         const identityItem = req.body;
-		const commitment = identityItem.commitment.toString();
+		const commitment = identityItem.identityCommitment.toString();
 		const bcAddress = identityItem.blockchainAddress.toString();
 		const zkProof = identityItem.zkProof.toString();
 
