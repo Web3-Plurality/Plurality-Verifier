@@ -44,7 +44,7 @@ export const getCurrentGroupState = async () => {
 
   //TODO: Check if the current identity commitment is already in db
   await fetch(
-    process.env.REACT_APP_API_BASE_URL+'/identities?groupId='+groupId, {
+    process.env.REACT_APP_API_BASE_URL+'/group/'+groupId, {
         method: "get",
         headers: {
             'Content-Type': 'application/json'
@@ -66,7 +66,7 @@ export const getCurrentGroupState = async () => {
 export const addToGroupState = async (groupId, identityCommitment) => {
   const sendBody = JSON.stringify({ "groupId": groupId, "identityCommitment": identityCommitment });
   await fetch(
-    process.env.REACT_APP_API_BASE_URL+'/identity', {
+    process.env.REACT_APP_API_BASE_URL+'/group', {
         method: "post",
         body: sendBody,
         headers: {
