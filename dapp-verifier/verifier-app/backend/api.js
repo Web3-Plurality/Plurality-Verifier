@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 require("dotenv").config();
 
 // TODO: Read url from .env file
@@ -107,7 +108,7 @@ app.post("/identity", async (req, resp) => {
 	}
 });
 
-const Group = mongoose.model('groups', GroupSchema);
+const Group = mongoose.model('groups', GroupSchema.GroupSchema);
 Group.createIndexes();
 
 app.get("/group", async (req, resp) => {

@@ -18,9 +18,6 @@ let group;
 let identityCommitmentsList;
 const groupId = process.env.REACT_APP_GROUP_ID;
 
-export const initMetamask = async () => {
-};
-
 
 export const init = async () => {
 
@@ -186,7 +183,10 @@ export const createGroup = async () => {
     const proverEthAddress = await requestPersonalSignOnProof(fullProof);
 
     // TODO: Store in database the address which signed the proof along with identity commitment and submitted proof
+    // need to store proverEthAddress, fullProof, and also need to return the identityCommitment used to generate the proof from the function fetchVerificationProofFromExtension
+    // all this then needs to be stored in the database
 
+    
     const receipt = await verifyZKProofSentByUser(fullProof);
     console.log("Receipt is: ");
     console.log(receipt);
