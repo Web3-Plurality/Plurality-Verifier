@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.1",
     "info": {
-      "title": "Verifier API Swagger Documentation - WIP",
+      "title": "Verifier API Swagger Documentation",
       "version": "1.0.0"
     },
     "schemes": ["http"],
