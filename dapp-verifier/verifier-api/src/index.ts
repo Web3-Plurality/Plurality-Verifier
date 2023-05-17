@@ -7,30 +7,11 @@ import * as mongoose from "mongoose";
 import { groupRouter } from './controllers/GroupController';
 import { identityRouter } from './controllers/IdentityController';
 
-//import exampleRoutes from "./routes/example-route";
-//import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import * as swaggerDocument from "./swagger.json";
 
 
 dotenv.config();
-
-/*const options = {
-  definition: {
-    openapi: "3.0.1",
-    info: {
-      title: "REST API for Swagger Documentation",
-      version: "1.0.0",
-    },
-    schemes: ["http", "https"],
-    servers: [{ url: "http://localhost:3000/" }],
-  },
-  apis: [
-    `${__dirname}/routes/example-route.ts`,
-    "./dist/routes/example-route.js",
-  ],
-};*/
-//const swaggerSpec = swaggerJSDoc(options);
 
 const app: Application = express();
 const PORT = process.env.PORT;
