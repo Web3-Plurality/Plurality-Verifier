@@ -112,7 +112,7 @@ export const createGroup = async () => {
     let identityCommitmentsList = await getCurrentGroupState();
 
     var obj = {
-      title: "Plurality Verifier - Test dApp Proof ", 
+      title: process.env.REACT_APP_DAPP_PROOF_NAME, 
       identityCommitments: identityCommitmentsList, 
       groupId: groupId
     }
