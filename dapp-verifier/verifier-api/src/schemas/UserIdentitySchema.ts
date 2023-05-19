@@ -7,12 +7,10 @@ export const UserIdentitySchema = new mongoose.Schema({
 	},
 	blockchainAddress: {
 		type: String,
-		required: true,
-        unique: true
+		required: true
 	},
     zkProof: {
 		type: String,
-		required: true,
-        unique: true
+		required: true
 	}
 });
