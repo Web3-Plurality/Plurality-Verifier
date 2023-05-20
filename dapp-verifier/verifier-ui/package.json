@@ -3,12 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@openzeppelin/contracts": "4.7.3",
-    "@semaphore-protocol/contracts": "3.4.0",
-    "@semaphore-protocol/data": "3.4.0",
     "@semaphore-protocol/group": "3.4.0",
-    "@semaphore-protocol/identity": "3.4.0",
-    "@semaphore-protocol/proof": "3.4.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -31,7 +26,7 @@
     "web3": "^1.9.0"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "react-scripts --openssl-legacy-provider start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -55,12 +50,9 @@
     ]
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.2.3",
-    "@nomiclabs/hardhat-waffle": "^2.0.5",
     "chai": "^4.3.7",
     "dotenv": "^14.3.2",
     "ethereum-waffle": "^4.0.10",
-    "ethers": "^5.7.2",
-    "hardhat": "^2.13.1"
+    "ethers": "^5.7.2"
   }
 }

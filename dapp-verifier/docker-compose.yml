@@ -1,0 +1,37 @@
+version: "3.9"
+services:
+  #######
+  # Verifier Backend
+  #######
+  plurality-verifier-be:
+    build:
+      context: ./verifier-backend
+      dockerfile: Dockerfile
+    environment:
+      MONGO_CONNECTION_URL: ${MONGO_URL}
+      PORT: ${VERIFIER_BACKEND_PORT}
+    ports:
+      - ${VERIFIER_BACKEND_PORT}:${VERIFIER_BACKEND_PORT}
+    restart: always
+  #######
+  # Verifier UI
+  #######
+  plurality-verifier-ui:
+    build:
+      context: ./verifier-ui
+      dockerfile: Dockerfile
+    environment:
+      REACT_APP_SEMAPHORE_IDENTITY_CONTRACT: ${SEMAPHORE_IDENTITY_CONTRACT}
+      REACT_APP_ETHEREUM_NETWORK: ${ETHEREUM_NETWORK}
+      REACT_APP_INFURA_API_KEY: ${INFURA_API_KEY}
+      REACT_APP_SIGNER_PRIVATE_KEY: ${VERIFIER_WALLET_PRIVATE_KEY}
+      REACT_APP_GROUP_ID: ${GROUP_ID}
+      REACT_APP_API_BASE_URL: ${VERIFIER_BACKEND_URL}
+      REACT_APP_DAPP_PROOF_NAME: ${PROOF_NAME}
+      REACT_APP_IDENTITY_EVENT_NAME: ${IDENTITY_EVENT}
+      REACT_APP_PROOF_EVENT_NAME: ${PROOF_EVENT}
+    ports:
+      - ${VERIFIER_UI_PORT}:${VERIFIER_UI_PORT}
+    depends_on:
+      - plurality-verifier-be
+    restart: always
