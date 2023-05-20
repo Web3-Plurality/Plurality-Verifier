@@ -38,7 +38,7 @@ const Verifier = () => {
         setTextAreaValue(message);
         
         // start looping
-        waitForAcceptance();
+        //waitForAcceptance();
     })
     .catch(error => {
       message = message + 'There was an error!'+ error + '\n'; 
@@ -156,7 +156,7 @@ const Verifier = () => {
   }
  
   useEffect(()=>{
-    generateQR();
+    //generateQR();
   }, []) // <-- empty dependency array, ensures that the function runs only once on load
 
   useEffect(() => {
