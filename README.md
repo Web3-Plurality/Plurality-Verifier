@@ -14,8 +14,9 @@
 
 We use the `docker-compose.yml` file to bootstrap the verifier for the basic demo. 
 
-1. Create `.env` file from `.env-example`
-2. Start the application containers using following command
+1. Change directory into `dapp-verifier` folder
+2. Create `.env` file from `.env-example`
+3. Start the application containers using following command
 
 ```
 docker-compose up
