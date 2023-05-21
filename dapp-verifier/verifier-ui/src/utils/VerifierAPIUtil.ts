@@ -5,7 +5,7 @@ import { Group } from "@semaphore-protocol/group"
 // /group/groupId -> send groupId and get list of all identity commitments
 export const getCurrentGroupState = async () => {
     //TODO: Check if the current identity commitment is already in db
-    const groupId = process.env.REACT_APP_GROUP_ID;
+    const groupId = process.env.REACT_APP_GROUP_ID!;
     
     let identityCommitmentsList = await fetch(
       process.env.REACT_APP_API_BASE_URL+'/group/'+groupId, {
@@ -30,7 +30,7 @@ export const getCurrentGroupState = async () => {
 
   // VERIFIER API POST CALL
   // /group -> send groupId and commitment in body to add this commitment in the list of identitycommitments against this group
-  export const addToGroupState = async (groupId, identityCommitment) => {
+  export const addToGroupState = async (groupId: any, identityCommitment: any) => {
     const sendBody = JSON.stringify({ "groupId": groupId, "identityCommitment": identityCommitment });
     await fetch(
       process.env.REACT_APP_API_BASE_URL+'/group', {
@@ -51,7 +51,7 @@ export const getCurrentGroupState = async () => {
   
   // VERIFIER API POST CALL
   // /identity -> send commitment, bcaddress and zk proof to add in the list of verified identities
-  export const addVerifiedIdentity = async (identityCommitment, blockchainAddress, fullProof) => {
+  export const addVerifiedIdentity = async (identityCommitment: any, blockchainAddress: any, fullProof: any) => {
     const sendBody = JSON.stringify({ "commitment": identityCommitment, "blockchainAddress": blockchainAddress, "zkProof": JSON.stringify(fullProof) });
     await fetch(
       process.env.REACT_APP_API_BASE_URL+'/identity', {

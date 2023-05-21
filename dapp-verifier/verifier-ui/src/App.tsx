@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import './App.css';
 import Navbar from './components/Navbar';
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
@@ -6,25 +7,20 @@ import Verifier from './pages/Verifier';
 import DApp from './pages/DApp';
 import NoPage from './pages/NoPage';
 
-// TODO: Add revocation later
-//import Revocation from './pages/Revocation';
-
-import React, { useEffect } from 'react';
 import {init} from './utils/Web3Client';
 
 function App() {
   useEffect(() => {
     init();
   }, []);
-  
+
   return (
     <Router>
     {<Navbar />}
     <Routes>
-        <Route exact path='/' exact element={<Verifier />} />
+        <Route path='/' element={<Verifier />} />
         <Route path='/verifier' element={<Verifier/>} />
         <Route path='/dapp' element={<DApp/>} />
-        {/*<Route path='/revocation' element={<Revocation/>} />*/}
         <Route path='*' element={<NoPage/>} />
     </Routes>
     </Router>

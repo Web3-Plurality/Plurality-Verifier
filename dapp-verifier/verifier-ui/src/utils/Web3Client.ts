@@ -8,9 +8,9 @@ import { getCurrentGroupState, addToGroupState, addVerifiedIdentity } from "./Ve
 import { requestPersonalSignOnProof } from "./PersonalSignUtil";
 
 
-let semaphoreIdentityContract;
-let signer;
-let network;
+let semaphoreIdentityContract: any;
+let signer: any;
+let network: any;
 let isInitialized = false;
 let merkleTreeDepth = 20;
 const signal = 1;
@@ -28,11 +28,12 @@ export const init = async () => {
   );
   // Creating a signing account from a private key
   signer = web3.eth.accounts.privateKeyToAccount(
-    process.env.REACT_APP_SIGNER_PRIVATE_KEY
+    process.env.REACT_APP_SIGNER_PRIVATE_KEY!
   );
   web3.eth.accounts.wallet.add(signer);
   console.log(SemaphoreIdentity.abi);
-  semaphoreIdentityContract = new web3.eth.Contract(SemaphoreIdentity.abi,process.env.REACT_APP_SEMAPHORE_IDENTITY_CONTRACT); //contract address at sepolia
+  const abi: any = SemaphoreIdentity.abi;
+  semaphoreIdentityContract = new web3.eth.Contract(abi,process.env.REACT_APP_SEMAPHORE_IDENTITY_CONTRACT); //contract address at sepolia
   console.log(semaphoreIdentityContract);
   isInitialized = true;
 };
@@ -56,7 +57,7 @@ export const createGroup = async () => {
         from: signer.address,
         gas: await tx.estimateGas(),
         })
-        .once("transactionHash", (txhash) => {
+        .once("transactionHash", (txhash: any) => {
           console.log(`Mining createGroup transaction ...`);
           console.log(`https://${network}.etherscan.io/tx/${txhash}`);
         });
@@ -71,7 +72,7 @@ export const createGroup = async () => {
       }
   };
 
-  export const addMemberToGroup = async (identityCommitment) => {
+  export const addMemberToGroup = async (identityCommitment: any) => {
     if (!isInitialized) {
       await init();
     }
@@ -94,7 +95,7 @@ export const createGroup = async () => {
       gas: ethers.utils.parseUnits("9100000", "wei"),
       //gas: await tx.estimateGas(),
     })
-    .once("transactionHash", (txhash) => {
+    .once("transactionHash", (txhash: any) => {
       console.log(`Mining addMemberToGroup transaction ...`);
       console.log(`https://${network}.etherscan.io/tx/${txhash}`);
     });
@@ -133,7 +134,7 @@ export const createGroup = async () => {
     return receipt;
   };
 
-  export const verifyZKProofSentByUser = async (fullProof) => {
+  export const verifyZKProofSentByUser = async (fullProof: any) => {
 
     if (!isInitialized) {
       await init();
@@ -153,7 +154,7 @@ export const createGroup = async () => {
       from: signer.address,
       gas: await tx.estimateGas()    
     })
-    .once("transactionHash", (txhash) => {
+    .once("transactionHash", (txhash: any) => {
       console.log(`Mining verifyZKProofSentByUser transaction ...`);
       console.log(`https://${network}.etherscan.io/tx/${txhash}`);
     });
@@ -170,27 +171,4 @@ export const createGroup = async () => {
       console.log("Proof is invalid. Returning false");
       return false;
     }
-  };
-
-  // TODO: Fix the revocation workflow and this function
-  export const removeMemberFromGroup = async (identityCommitment) => {
-    if (!isInitialized) {
-      await init();
-    }
-    
-    // NOT WORKING
-    /*const index = window.group.indexOf(identityCommitment) // 0
-    console.log(index);
-    const merkelProof = await window.group.generateMerkleProof(index);  
-    console.log(merkelProof);  
-    const proofPath = merkelProof.pathIndices;
-    console.log(proofPath);
-    const proofSiblings = merkelProof.siblings;
-    console.log(proofSiblings);
-    //window.group.removeMember(index);
-
-    //TODO: Fix the tx as per infura syntax
-    return semaphoreIdentityContract.methods
-      .removeMember(window.groupId,identityCommitment, proofSiblings, proofPath)
-      .send({from: selectedAccount})*/
   };
