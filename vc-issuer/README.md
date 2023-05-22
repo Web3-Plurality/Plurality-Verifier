@@ -3,6 +3,7 @@
 ## Prerequisites
 
 The following tools should be installed on your developer machine:
+
 - docker
 - docker-compose
 - (optional) [ngrok](https://ngrok.com/) or [diode](https://support.diode.io/) to have a public endpoint to communicate with other Business Partner Agents
@@ -14,11 +15,11 @@ Furthermore, the firewall might block traffic to other agents depending on its e
 ## Telekom Prerequisites
 
 The following actions need to be taken in order to set up your development environment:
+
 - Contact BT to open the IP/Ports for test ledger from your machine. For BCovrin Test it would be **IP=138.197.138.255 & Ports=9701-9708**
 - Install Esatus Wallet app on your mobile phones from play/app store
 - Add custom ledger in your esatus app and upload the BCovrin Testnet's genesis file (http://test.bcovrin.vonx.io/genesis)
 - Afterwards follow the steps below to run the issuer/verifier in your cloud/local machine and use your mobile phone as holder wallet.
-
 
 ## TL;DR
 
@@ -34,21 +35,26 @@ docker compose --env-file .env -f docker-compose.yml up
 ## Spinning up a single BPA
 
 - If you have a setup using ngrok for making the agent publicly available, running
+
 ```s
 ./start-with-tunnels.sh
 ```
-will set up the tunnel and start everything for you. Before making your agent publicly available, 
-you most likely want to change the security options, at least set passwords, in the `.env` file. 
+
+will set up the tunnel and start everything for you. Before making your agent publicly available,
+you most likely want to change the security options, at least set passwords, in the `.env` file.
 See the security section below for details.
 
 Alternatively, for a local test, just run
+
 ```s
 # If not done already, run
 # ./register-dids.sh
 docker-compose up
 ```
+
 **Note**: this will also compile the BPA from the checked out sources, which can take a while.
 If you want to speed things up you can disable this by running
+
 ```shell
 docker compose -f docker-compose.yml up
 ```
@@ -74,6 +80,7 @@ docker-compose --profile second_bpa up
 ```
 
 ### Accessing the second frontend
+
 - The second frontend will be served at `http://localhost:8090`. If you did not change the password in `.env` the default login is "admin"/"changeme".
 - The second backends swagger will be served at: `http://localhost:8090/swagger-ui`
 - The second aca-py's swagger api will be served at: `http://localhost:8041/api/doc`
@@ -100,6 +107,7 @@ Just run:
 ```
 
 You should see some output like this:
+
 ```s
 Registering DID for ACAPY_SEED
 {
@@ -119,35 +127,41 @@ Alternatively, you can register a DID manually:
 
 1. Go to http://test.bcovrin.vonx.io/
 2. Provide a 32 character wallet seed on the right side under "Authenticate a new DID" and click on "Register DID"
-3. Make a copy of the provided [.env-example file](.env-example) with the name `.env`. Set the `AGENT1_SEED` to the wallet seed. Repeat this process for the second DID if needed, and set the `ACAPY_SEED2` to the second wallet seed.
+3. Make a copy of the provided [.env.example file](.env.example) with the name `.env`. Set the `AGENT1_SEED` to the wallet seed. Repeat this process for the second DID if needed, and set the `ACAPY_SEED2` to the second wallet seed.
 
 ## Get a public IP
+
 If you did not deploy your agent on a server with a public ip it won't have public endpoints to communicate with other agents.
 A simple way to get public endpoints for your agent is to set up [ngrok](https://ngrok.com/).
 
 If you have set up ngrok you can use the `start-with-tunnels.sh` script to start your agent with public endpoints. Note that this scripts expects the `ngrok` command to be available in the global path, and additionally requires the `jq` command (which may need to be installed first on your machine).
+
 ```s
 ./start-with-tunnels.sh
 ```
+
 To terminate all ngrok tunnels you can use
+
 ```s
 ./kill-tunnels.sh
 ```
 
-***BE AWARE:*** If you don't have any security enabled the Business Partner API and the frontend will be publicly available. This is in particular important when running in Aries mode where the public IP is written to the ledger.
+**_BE AWARE:_** If you don't have any security enabled the Business Partner API and the frontend will be publicly available. This is in particular important when running in Aries mode where the public IP is written to the ledger.
 
 ## Setup Security
 
 In your `.env` under `Security config` file set
+
 ```s
 BPA_SECURITY_ENABLED=true
 ```
+
 and a username and password.
 
 Ideally also configure a secure connection between the backend services (core and aca-py).
 This can be achieved by setting an API key in `.env` file via `ACAPY_ADMIN_CONFIG` (see example).
 
-**Note**: If security is enabled the BPA must be run behind a TLS proxy, 
+**Note**: If security is enabled the BPA must be run behind a TLS proxy,
 if login over plain HTTP is desired `-Dmicronaut.session.http.cookie-secure=false`
 needs to be set in the JAVA_OPTS section of the docker-compose.yml for both bpa1 and bpa2. If this is not set
 the login will fail in Chrome based browsers.
@@ -165,6 +179,7 @@ E.g. to exchange the logo you can set:
 -Dbpa.ux.navigation.avatar.agent.default="false"
 -Dbpa.ux.navigation.avatar.agent.src=data:image/png;base64,<...>
 ```
+
 In the JAVA_OPTS section of the bpa-agent1 or bpa-agent2 in the docker compose file.
 
 ## Compatibility with older mobile wallets
@@ -176,4 +191,5 @@ in `acapy-static-args.yml`:
 emit-new-didcomm-prefix: false
 emit-new-didcomm-mime-type: false
 ```
-This is because some older apps do not support the new didcomm mime types.  
+
+This is because some older apps do not support the new didcomm mime types.

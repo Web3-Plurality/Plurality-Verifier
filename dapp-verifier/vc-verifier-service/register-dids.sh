@@ -30,7 +30,7 @@ if [ ! -x "$(which curl)" ] ; then
     exit 1
 fi
 
-SRC_FILE=${SRC_FILE:-".env-example"}
+SRC_FILE=${SRC_FILE:-".env.example"}
 DEST_FILE=${DEST_FILE:-".env"}
 
 # Set URL

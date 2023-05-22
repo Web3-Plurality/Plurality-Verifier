@@ -12,10 +12,10 @@
 
 # Steps to run Plurality Verifier
 
-We use the `docker-compose.yml` file to bootstrap the verifier for the basic demo. 
+We use the `docker-compose.yml` file to bootstrap the verifier for the basic demo.
 
 1. Change directory into `dapp-verifier` folder
-2. Create `.env` file from `.env-example`
+2. Create `.env` file from `.env.example`
 3. Start the application containers using following command
 
 ```
