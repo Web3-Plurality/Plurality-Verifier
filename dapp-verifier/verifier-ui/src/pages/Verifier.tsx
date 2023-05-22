@@ -10,11 +10,15 @@ const Verifier = () => {
 
   const logoRef=useRef<HTMLImageElement>(null);
 
-  let identityCommitment: any;
+  let identityCommitment: string | undefined;
   let message: string;
 
   async function createUserIdentity() {
     identityCommitment = await fetchIdentityCommitmentFromExtension();
+    if (identityCommitment === "" || identityCommitment === null) {
+      console.log("Error: The extension did not return a valid identity commitment.");
+      return;
+    }
     
     message = message + `Step 3/4 Complete: Your identity material has been generated inside the extension. Please keep it safe and private \n
     Public Commitment shared by the extension is: ${identityCommitment} \n \n
@@ -60,9 +64,6 @@ const Verifier = () => {
           <br/>
           <h4 className="text-center">Scan the QR code to connect to verifier and provide proof details</h4>
           <p>Proof Required: Information from Identity Card  </p>
-          {/*<div style={{ display: 'flex', alignItems: 'center', justifyContent: "center"}}>
-            <canvas ref={canvasRef}  />
-          </div>*/}
           <button onClick={createUserIdentity} type="button" className="btn btn-primary me-md-2" data-bs-toggle="button">Generate New Proof Invitation</button>
           <br/> <br/>
           <textarea className="form-control" rows={12} value={textAreaValue} aria-label="Disabled input example" disabled readOnly></textarea>

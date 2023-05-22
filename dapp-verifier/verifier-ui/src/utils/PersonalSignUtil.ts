@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-export const requestPersonalSignOnProof = async (fullProof: any) => {
+export const requestPersonalSignOnProof = async (fullProof: Object) => {
     console.log("In personal sign");
     try {
       if (!window.ethereum)
@@ -11,8 +11,12 @@ export const requestPersonalSignOnProof = async (fullProof: any) => {
       const signer = await provider.getSigner();
       // TODO: Check if we need to verify this signature somehow?
       const signature = await signer.signMessage(JSON.stringify(fullProof));
-      const address = await signer.getAddress();
+      const address: string = await signer.getAddress();
       console.log(`Message was signed by the address ${address}`);
+      if (address === "" || address === null) {
+        console.log("Error: The address of the signer could not be fetched. Returning");
+        return "";
+      }
       return address;
     }
     catch (err) {

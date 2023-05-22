@@ -13,12 +13,16 @@ const DApp = () => {
 
   const logoRef=useRef<HTMLImageElement>(null);
 
-  let message;
+  let message: string;
 
   async function verifyRequestDApp() {
     message = `Verification Started: User provide zk-proof to the DApp for membership verification\n`;
     setTextAreaValue(message);
-    const imgRef: any = imageRef.current;
+    if (imageRef.current === null) {
+      console.log("Error: Image Reference is null.");
+      return;
+    }
+    const imgRef = imageRef.current;
     try {
       const isVerified = await sendGroupStateToPlurality();
       console.log("Proof verification result: "+ isVerified);

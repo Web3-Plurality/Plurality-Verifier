@@ -123,6 +123,9 @@ export const createGroup = async () => {
     let { fullProof, identityCommitment } = await fetchVerificationProofFromExtension(obj);
     console.log("Full proof is: "+ fullProof);
     console.log("Identity commitment is: "+ identityCommitment);
+
+    // TODO: This personal sign needs to be done when identity is created
+    // not when the proof is created
     const proverEthAddress = await requestPersonalSignOnProof(fullProof);
 
     // need to store in the database which identity commitment corresponds to which blockchain address and which zk proof
@@ -138,6 +141,10 @@ export const createGroup = async () => {
 
     if (!isInitialized) {
       await init();
+    }
+    if (fullProof === "" || fullProof === null) {
+      console.log("Error: Got empty proof in verify ZK Proof function. Returning");
+      return;
     }
     console.log("Sending proof to SC: "+ fullProof);
     console.log("GroupId: "+groupId);

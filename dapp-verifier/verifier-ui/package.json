@@ -8,9 +8,10 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.31",
     "@types/react": "^18.2.6",
     "@types/react-dom": "^18.2.4",
+    "@types/react-router": "^5.1.20",
+    "@types/react-router-dom": "^5.3.3",
     "@zk-kit/incremental-merkle-tree.sol": "^1.7.0",
     "axios": "^1.4.0",
     "base-64": "^1.0.0",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@types/base-64": "^1.0.0",
+    "@types/node": "^20.2.3",
     "@types/styled-components": "^5.1.26",
     "ethers": "^5.7.2",
     "typescript": "^5.0.4"
