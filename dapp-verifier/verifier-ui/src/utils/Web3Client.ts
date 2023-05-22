@@ -1,25 +1,28 @@
 /* global BigInt */
+// Do not remove the above pragma, it is used for accessing the BigInt conversion functions
 
-import Web3 from 'web3'
+import Web3 from 'web3';
+
 import SemaphoreIdentity from '../SemaphoreIdentity.json';
 import { ethers } from "ethers";
 import { fetchVerificationProofFromExtension } from "./ExtensionUtil";
 import { getCurrentGroupState, addToGroupState, addVerifiedIdentity } from "./VerifierAPIUtil";
 import { requestPersonalSignOnProof } from "./PersonalSignUtil";
+import { Contract } from 'web3-eth-contract';
+import { Account } from 'web3-core';
 
-
-let semaphoreIdentityContract: any;
-let signer: any;
-let network: any;
+let semaphoreIdentityContract: Contract;
+let signer: Account;
+let network: string;
 let isInitialized = false;
 let merkleTreeDepth = 20;
 const signal = 1;
-const groupId = process.env.REACT_APP_GROUP_ID;
+const groupId:string = process.env.REACT_APP_GROUP_ID!;
 
 export const init = async () => {
 
   // FOR INFURA
-  network = process.env.REACT_APP_ETHEREUM_NETWORK;
+  network = process.env.REACT_APP_ETHEREUM_NETWORK!;
   console.log("Network is: " + network);
   const web3 = new Web3(
     new Web3.providers.HttpProvider(
@@ -77,9 +80,9 @@ export const createGroup = async () => {
       await init();
     }
     await addToGroupState(groupId, identityCommitment);
-    console.log(typeof(identityCommitment));
+    //console.log(typeof(identityCommitment));
     identityCommitment = BigInt(identityCommitment);
-    console.log(typeof(identityCommitment));
+    //console.log(typeof(identityCommitment));
 
     console.log("Adding member to group");
     
@@ -126,10 +129,10 @@ export const createGroup = async () => {
 
     // TODO: This personal sign needs to be done when identity is created
     // not when the proof is created
-    const proverEthAddress = await requestPersonalSignOnProof(fullProof);
+    const proverEthAddress: string | undefined = await requestPersonalSignOnProof(fullProof);
 
     // need to store in the database which identity commitment corresponds to which blockchain address and which zk proof
-    await addVerifiedIdentity(identityCommitment, proverEthAddress, fullProof);
+    await addVerifiedIdentity(identityCommitment, proverEthAddress!, fullProof);
     
     const receipt = await verifyZKProofSentByUser(fullProof);
     console.log("Receipt is: ");

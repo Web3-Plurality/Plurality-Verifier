@@ -12,7 +12,7 @@ const Verifier = () => {
 
   let identityCommitment: string | undefined;
   let message: string;
-
+  let dAppName: string = process.env.REACT_APP_DAPP_NAME!;
   async function createUserIdentity() {
     identityCommitment = await fetchIdentityCommitmentFromExtension();
     if (identityCommitment === "" || identityCommitment === null) {
@@ -59,12 +59,12 @@ const Verifier = () => {
           <br/>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center"}}>
             <img src={mortgage} ref={logoRef} alt={"None"} style={{width: '50px', height: '50px' }} />
-            <h1 className="display-6 text-center"> &nbsp; Verifier for Mortgage Loans DApp</h1>
+            <h1 className="display-6 text-center"> &nbsp; Verifier for {dAppName}</h1>
           </div>
           <br/>
-          <h4 className="text-center">Scan the QR code to connect to verifier and provide proof details</h4>
-          <p>Proof Required: Information from Identity Card  </p>
-          <button onClick={createUserIdentity} type="button" className="btn btn-primary me-md-2" data-bs-toggle="button">Generate New Proof Invitation</button>
+          {/*<h4 className="text-center">Scan the QR code to connect to verifier and provide proof details</h4>
+          <p>Proof Required: Information from Identity Card  </p> */}
+          <button onClick={createUserIdentity} type="button" className="btn btn-primary me-md-2" data-bs-toggle="button">Create Your Plural Identity</button>
           <br/> <br/>
           <textarea className="form-control" rows={12} value={textAreaValue} aria-label="Disabled input example" disabled readOnly></textarea>
         </div>

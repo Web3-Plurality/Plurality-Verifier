@@ -14,6 +14,7 @@ const DApp = () => {
   const logoRef=useRef<HTMLImageElement>(null);
 
   let message: string;
+  let dAppName: string = process.env.REACT_APP_DAPP_NAME!;
 
   async function verifyRequestDApp() {
     message = `Verification Started: User provide zk-proof to the DApp for membership verification\n`;
@@ -50,7 +51,7 @@ const DApp = () => {
           <br/>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center"}}>
             <img src={mortgage} ref={logoRef} alt={"None"} style={{width: '50px', height: '50px' }} />
-            <h1 className="display-6 text-center">&nbsp; Mortgage Loans DApp</h1>
+            <h1 className="display-6 text-center">&nbsp; {dAppName} DApp</h1>
           </div>
           <br />
           <h4>Already verified yourself through our verifier? Please provide zero knowledge proof of verification</h4>
