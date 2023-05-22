@@ -1,25 +1,28 @@
 /* global BigInt */
+// Do not remove the above pragma, it is used for accessing the BigInt conversion functions
 
-import Web3 from 'web3'
+import Web3 from 'web3';
+
 import SemaphoreIdentity from '../SemaphoreIdentity.json';
 import { ethers } from "ethers";
 import { fetchVerificationProofFromExtension } from "./ExtensionUtil";
 import { getCurrentGroupState, addToGroupState, addVerifiedIdentity } from "./VerifierAPIUtil";
 import { requestPersonalSignOnProof } from "./PersonalSignUtil";
+import { Contract } from 'web3-eth-contract';
+import { Account } from 'web3-core';
 
-
-let semaphoreIdentityContract;
-let signer;
-let network;
+let semaphoreIdentityContract: Contract;
+let signer: Account;
+let network: string;
 let isInitialized = false;
 let merkleTreeDepth = 20;
 const signal = 1;
-const groupId = process.env.REACT_APP_GROUP_ID;
+const groupId:string = process.env.REACT_APP_GROUP_ID!;
 
 export const init = async () => {
 
   // FOR INFURA
-  network = process.env.REACT_APP_ETHEREUM_NETWORK;
+  network = process.env.REACT_APP_ETHEREUM_NETWORK!;
   console.log("Network is: " + network);
   const web3 = new Web3(
     new Web3.providers.HttpProvider(
@@ -28,11 +31,12 @@ export const init = async () => {
   );
   // Creating a signing account from a private key
   signer = web3.eth.accounts.privateKeyToAccount(
-    process.env.REACT_APP_SIGNER_PRIVATE_KEY
+    process.env.REACT_APP_SIGNER_PRIVATE_KEY!
   );
   web3.eth.accounts.wallet.add(signer);
   console.log(SemaphoreIdentity.abi);
-  semaphoreIdentityContract = new web3.eth.Contract(SemaphoreIdentity.abi,process.env.REACT_APP_SEMAPHORE_IDENTITY_CONTRACT); //contract address at sepolia
+  const abi: any = SemaphoreIdentity.abi;
+  semaphoreIdentityContract = new web3.eth.Contract(abi,process.env.REACT_APP_SEMAPHORE_IDENTITY_CONTRACT); //contract address at sepolia
   console.log(semaphoreIdentityContract);
   isInitialized = true;
 };
@@ -56,7 +60,7 @@ export const createGroup = async () => {
         from: signer.address,
         gas: await tx.estimateGas(),
         })
-        .once("transactionHash", (txhash) => {
+        .once("transactionHash", (txhash: any) => {
           console.log(`Mining createGroup transaction ...`);
           console.log(`https://${network}.etherscan.io/tx/${txhash}`);
         });
@@ -71,14 +75,14 @@ export const createGroup = async () => {
       }
   };
 
-  export const addMemberToGroup = async (identityCommitment) => {
+  export const addMemberToGroup = async (identityCommitment: any) => {
     if (!isInitialized) {
       await init();
     }
     await addToGroupState(groupId, identityCommitment);
-    console.log(typeof(identityCommitment));
+    //console.log(typeof(identityCommitment));
     identityCommitment = BigInt(identityCommitment);
-    console.log(typeof(identityCommitment));
+    //console.log(typeof(identityCommitment));
 
     console.log("Adding member to group");
     
@@ -94,7 +98,7 @@ export const createGroup = async () => {
       gas: ethers.utils.parseUnits("9100000", "wei"),
       //gas: await tx.estimateGas(),
     })
-    .once("transactionHash", (txhash) => {
+    .once("transactionHash", (txhash: any) => {
       console.log(`Mining addMemberToGroup transaction ...`);
       console.log(`https://${network}.etherscan.io/tx/${txhash}`);
     });
@@ -122,10 +126,13 @@ export const createGroup = async () => {
     let { fullProof, identityCommitment } = await fetchVerificationProofFromExtension(obj);
     console.log("Full proof is: "+ fullProof);
     console.log("Identity commitment is: "+ identityCommitment);
-    const proverEthAddress = await requestPersonalSignOnProof(fullProof);
+
+    // TODO: This personal sign needs to be done when identity is created
+    // not when the proof is created
+    const proverEthAddress: string | undefined = await requestPersonalSignOnProof(fullProof);
 
     // need to store in the database which identity commitment corresponds to which blockchain address and which zk proof
-    await addVerifiedIdentity(identityCommitment, proverEthAddress, fullProof);
+    await addVerifiedIdentity(identityCommitment, proverEthAddress!, fullProof);
     
     const receipt = await verifyZKProofSentByUser(fullProof);
     console.log("Receipt is: ");
@@ -133,10 +140,14 @@ export const createGroup = async () => {
     return receipt;
   };
 
-  export const verifyZKProofSentByUser = async (fullProof) => {
+  export const verifyZKProofSentByUser = async (fullProof: any) => {
 
     if (!isInitialized) {
       await init();
+    }
+    if (fullProof === "" || fullProof === null) {
+      console.log("Error: Got empty proof in verify ZK Proof function. Returning");
+      return;
     }
     console.log("Sending proof to SC: "+ fullProof);
     console.log("GroupId: "+groupId);
@@ -153,7 +164,7 @@ export const createGroup = async () => {
       from: signer.address,
       gas: await tx.estimateGas()    
     })
-    .once("transactionHash", (txhash) => {
+    .once("transactionHash", (txhash: any) => {
       console.log(`Mining verifyZKProofSentByUser transaction ...`);
       console.log(`https://${network}.etherscan.io/tx/${txhash}`);
     });
@@ -170,27 +181,4 @@ export const createGroup = async () => {
       console.log("Proof is invalid. Returning false");
       return false;
     }
-  };
-
-  // TODO: Fix the revocation workflow and this function
-  export const removeMemberFromGroup = async (identityCommitment) => {
-    if (!isInitialized) {
-      await init();
-    }
-    
-    // NOT WORKING
-    /*const index = window.group.indexOf(identityCommitment) // 0
-    console.log(index);
-    const merkelProof = await window.group.generateMerkleProof(index);  
-    console.log(merkelProof);  
-    const proofPath = merkelProof.pathIndices;
-    console.log(proofPath);
-    const proofSiblings = merkelProof.siblings;
-    console.log(proofSiblings);
-    //window.group.removeMember(index);
-
-    //TODO: Fix the tx as per infura syntax
-    return semaphoreIdentityContract.methods
-      .removeMember(window.groupId,identityCommitment, proofSiblings, proofPath)
-      .send({from: selectedAccount})*/
   };

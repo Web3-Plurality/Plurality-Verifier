@@ -1,4 +1,3 @@
-import React from "react";
 import { Nav, NavLink, NavMenu } from "./NavbarElements";
   
 const Navbar = () => {
@@ -12,9 +11,6 @@ const Navbar = () => {
           <NavLink to="/dapp">
             DApp
           </NavLink>
-          {/*<NavLink to="/revocation">
-            Revocation
-          </NavLink>*/}
         </NavMenu>
       </Nav>
     </>
