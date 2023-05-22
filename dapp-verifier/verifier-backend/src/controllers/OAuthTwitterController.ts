@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import passport from "passport";
 import { Strategy } from '@superfaceai/passport-twitter-oauth2';
 import * as dotenv from 'dotenv';
+import { json } from "body-parser";
 
 export const twitterRouter = express.Router();
 
@@ -48,6 +49,10 @@ twitterRouter.get(
   passport.authenticate('twitter'),
   function (req, res) {
     const userData = JSON.stringify(req.user, undefined, 2);
-    res.end(`${userData}`);
+    console.log(`${userData}`);
+    const o : any = JSON.parse(userData);
+    console.log(o.username);
+    console.log(o.displayName);
+    res.redirect(`/verifier?id_platform=twitter&username=${o.username}&display_name=${o.displayName}`);
   }
 );

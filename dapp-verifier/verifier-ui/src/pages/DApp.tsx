@@ -3,7 +3,7 @@ import '../bootstrap.css';
 import { sendGroupStateToPlurality } from '../utils/Web3Client';
 import verifiedImg from '../images/verified.png';
 import unverifiedImg from '../images/unverified.png';
-import mortgage from '../images/mortgage.png';
+import people from '../images/people.png';
 import pending from '../images/pending.png';
 
 const DApp = () => {
@@ -50,13 +50,13 @@ const DApp = () => {
         <div className="text-center">
           <br/>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center"}}>
-            <img src={mortgage} ref={logoRef} alt={"None"} style={{width: '50px', height: '50px' }} />
+            <img src={people} ref={logoRef} alt={"None"} style={{width: '50px', height: '50px' }} />
             <h1 className="display-6 text-center">&nbsp; {dAppName} DApp</h1>
           </div>
           <br />
-          <h4>Already verified yourself through our verifier? Please provide zero knowledge proof of verification</h4>
+          <h4>Already verified yourself? Please provide zero knowledge proof of verification</h4>
           <br/>
-          <button onClick={verifyRequestDApp} type="button" className="btn btn-primary me-md-2" data-bs-toggle="button">Provide ZK-Proof to DApp for Access</button>
+          <button onClick={verifyRequestDApp} type="button" style={{backgroundColor:'#DE3163', borderColor: '#DE3163', color:'#FFFFFF'}} className="btn btn-primary me-md-2" data-bs-toggle="button">Provide ZK-Proof for verification</button>
           <br/> <br/><br/>
 
           <img ref={imageRef} src={pending} alt={"None"} style={{width: '200px', height: '200px'}} />

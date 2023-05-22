@@ -1,7 +1,7 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import '../bootstrap.css';
 import { createGroup, addMemberToGroup } from '../utils/Web3Client';
-import mortgage from '../images/mortgage.png';
+import people from '../images/people.png';
 import { sleep } from "../utils/SleepUtil";
 import { fetchIdentityCommitmentFromExtension } from '../utils/ExtensionUtil';
 import { getTwitterID } from '../utils/VerifierAPIUtil';
@@ -13,16 +13,26 @@ const Verifier = () => {
   const logoRef=useRef<HTMLImageElement>(null);
 
   let identityCommitment: string | undefined;
-  let message: string;
+  let message: string = "";
   let dAppName: string = process.env.REACT_APP_DAPP_NAME!;
+  let username: string;
+  let display_name: string;
+
+  useEffect(() => {
+        // get the proof request params for this popup
+        const params = new URLSearchParams(window.location.search)
+        username = params.get('username')!;
+        display_name = params.get('display_name')!;
+    message = message + `Step 2/4 Complete: Successfully verified social identity from Twitter account \nUsername: ${username} \nName: ${display_name} \n`
+    setTextAreaValue(message);
+    }, [])
+
   async function createUserIdentity() {
-    let twitterId= await getTwitterID();
     identityCommitment = await fetchIdentityCommitmentFromExtension();
     if (identityCommitment === "" || identityCommitment === null) {
       console.log("Error: The extension did not return a valid identity commitment.");
       return;
     }
-    message = message + `Step 1/2 Complete: Successfully verified social identity from Twitter account \n ${twitterId} \n`
     message = message + `Step 3/4 Complete: Your identity material has been generated inside the extension. Please keep it safe and private \n
     Public Commitment shared by the extension is: ${identityCommitment} \n \n
     Step 4/4 Started: Adding generated identity to a group on smart contract in a privacy-preserving manner \n
@@ -61,13 +71,13 @@ const Verifier = () => {
         <div className="text-center">
           <br/>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: "center"}}>
-            <img src={mortgage} ref={logoRef} alt={"None"} style={{width: '50px', height: '50px' }} />
-            <h1 className="display-6 text-center"> &nbsp; Verifier for {dAppName}</h1>
+            <img src={people} ref={logoRef} alt={"None"} style={{width: '50px', height: '50px' }} />
+            <h1 className="display-6 text-center"> &nbsp; {dAppName} Verifier</h1>
           </div>
           <br/>
-          {/*<h4 className="text-center">Scan the QR code to connect to verifier and provide proof details</h4>
-          <p>Proof Required: Information from Identity Card  </p> */}
-          <button onClick={createUserIdentity} type="button" className="btn btn-primary me-md-2" data-bs-toggle="button">Create Your Plural Identity</button>
+          <h4 className="text-center">Link verified identity with Plurality's zero knowledge identity layer</h4>
+          <p>Use Plurality Browser Extension to create a decentralized identifier and link it with Blockchain address</p> 
+          <button onClick={createUserIdentity} type="button" style={{backgroundColor:'#DE3163', borderColor: '#DE3163', color:'#FFFFFF'}} className="btn btn-primary me-md-2" data-bs-toggle="button">Link your plural identity onchain</button>
           <br/> <br/>
           <textarea className="form-control" rows={12} value={textAreaValue} aria-label="Disabled input example" disabled readOnly></textarea>
         </div>

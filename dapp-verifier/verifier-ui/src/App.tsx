@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 
 import Verifier from './pages/Verifier';
 import DApp from './pages/DApp';
+import Auth from './pages/Auth';
 import NoPage from './pages/NoPage';
 
 import {init} from './utils/Web3Client';
@@ -18,7 +19,8 @@ function App() {
     <Router>
     {<Navbar />}
     <Routes>
-        <Route path='/' element={<Verifier />} />
+        <Route path='/' element={<Auth />} />
+        <Route path='/auth' element={<Auth/>} />
         <Route path='/verifier' element={<Verifier/>} />
         <Route path='/dapp' element={<DApp/>} />
         <Route path='*' element={<NoPage/>} />

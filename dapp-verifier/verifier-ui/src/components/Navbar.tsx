@@ -5,11 +5,14 @@ const Navbar = () => {
     <>
       <Nav>
         <NavMenu>
+        <NavLink to="/auth">
+            Create
+          </NavLink>
           <NavLink to="/verifier">
-            Verifier
+            Link
           </NavLink>
           <NavLink to="/dapp">
-            DApp
+            Verify
           </NavLink>
         </NavMenu>
       </Nav>
