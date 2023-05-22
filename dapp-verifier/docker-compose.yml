@@ -4,19 +4,26 @@ services:
   # Verifier Backend
   #######
   plurality-verifier-be:
+    container_name: plurality-verifier-be
     build:
       context: ./verifier-backend
       dockerfile: Dockerfile
     environment:
       MONGO_CONNECTION_URL: ${MONGO_URL}
       PORT: ${VERIFIER_BACKEND_PORT}
+      BASE_URL: ${VERIFIER_BACKEND_URL}
+      TWITTER_CLIENT_ID: ${TWITTER_CLIENT_ID}
+      TWITTER_CLIENT_SECRET: ${TWITTER_CLIENT_SECRET}
     ports:
       - ${VERIFIER_BACKEND_PORT}:${VERIFIER_BACKEND_PORT}
     restart: always
+    networks:
+      - plurality-verifier-network
   #######
   # Verifier UI
   #######
   plurality-verifier-ui:
+    container_name: plurality-verifier-ui
     build:
       context: ./verifier-ui
       dockerfile: Dockerfile
@@ -31,8 +38,28 @@ services:
       REACT_APP_DAPP_NAME: ${DAPP_NAME}
       REACT_APP_IDENTITY_EVENT_NAME: ${IDENTITY_EVENT}
       REACT_APP_PROOF_EVENT_NAME: ${PROOF_EVENT}
+      GENERATE_SOURCEMAP: ${GENERATE_SOURCEMAP}
     ports:
       - ${VERIFIER_UI_PORT}:${VERIFIER_UI_PORT}
     depends_on:
       - plurality-verifier-be
     restart: always
+    networks:
+      - plurality-verifier-network
+  #######
+  # Ingress
+  #######
+  ingress:
+    container_name: ingress
+    image: nginx:1.15.10-alpine
+    ports:
+      - target: 80
+        published: 8080 # walletkit and issuer ui publish port
+        protocol: tcp
+        mode: host
+    volumes:
+      - ./ingress.conf:/etc/nginx/conf.d/default.conf # API gateway configuration
+    networks:
+      - plurality-verifier-network
+networks:
+  plurality-verifier-network:

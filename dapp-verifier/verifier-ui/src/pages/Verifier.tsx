@@ -4,6 +4,8 @@ import { createGroup, addMemberToGroup } from '../utils/Web3Client';
 import mortgage from '../images/mortgage.png';
 import { sleep } from "../utils/SleepUtil";
 import { fetchIdentityCommitmentFromExtension } from '../utils/ExtensionUtil';
+import { getTwitterID } from '../utils/VerifierAPIUtil';
+
 const Verifier = () => {
 
   const [textAreaValue, setTextAreaValue] = useState("Results");
@@ -14,12 +16,13 @@ const Verifier = () => {
   let message: string;
   let dAppName: string = process.env.REACT_APP_DAPP_NAME!;
   async function createUserIdentity() {
+    let twitterId= await getTwitterID();
     identityCommitment = await fetchIdentityCommitmentFromExtension();
     if (identityCommitment === "" || identityCommitment === null) {
       console.log("Error: The extension did not return a valid identity commitment.");
       return;
     }
-    
+    message = message + `Step 1/2 Complete: Successfully verified social identity from Twitter account \n ${twitterId} \n`
     message = message + `Step 3/4 Complete: Your identity material has been generated inside the extension. Please keep it safe and private \n
     Public Commitment shared by the extension is: ${identityCommitment} \n \n
     Step 4/4 Started: Adding generated identity to a group on smart contract in a privacy-preserving manner \n
