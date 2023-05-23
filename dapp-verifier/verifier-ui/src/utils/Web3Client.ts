@@ -7,7 +7,6 @@ import SemaphoreIdentity from '../SemaphoreIdentity.json';
 import { ethers } from "ethers";
 import { fetchVerificationProofFromExtension } from "./ExtensionUtil";
 import { getCurrentGroupState, addToGroupState, addVerifiedIdentity } from "./VerifierAPIUtil";
-import { requestPersonalSignOnProof } from "./PersonalSignUtil";
 import { Contract } from 'web3-eth-contract';
 import { Account } from 'web3-core';
 
@@ -129,10 +128,10 @@ export const createGroup = async () => {
 
     // TODO: This personal sign needs to be done when identity is created
     // not when the proof is created
-    const proverEthAddress: string | undefined = await requestPersonalSignOnProof(fullProof);
+    //const proverEthAddress: string | undefined = await requestPersonalSignOnProof(fullProof);
 
     // need to store in the database which identity commitment corresponds to which blockchain address and which zk proof
-    await addVerifiedIdentity(identityCommitment, proverEthAddress!, fullProof);
+    //await addVerifiedIdentity(identityCommitment, proverEthAddress!, fullProof);
     
     const receipt = await verifyZKProofSentByUser(fullProof);
     console.log("Receipt is: ");

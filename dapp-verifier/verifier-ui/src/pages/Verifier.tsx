@@ -4,7 +4,9 @@ import { createGroup, addMemberToGroup } from '../utils/Web3Client';
 import people from '../images/people.png';
 import { sleep } from "../utils/SleepUtil";
 import { fetchIdentityCommitmentFromExtension } from '../utils/ExtensionUtil';
-import { getTwitterID } from '../utils/VerifierAPIUtil';
+import { requestPersonalSignOnIdentityCommitment } from '../utils/PersonalSignUtil';
+import { addVerifiedIdentity } from "../utils/VerifierAPIUtil";
+
 
 const Verifier = () => {
 
@@ -23,7 +25,7 @@ const Verifier = () => {
         const params = new URLSearchParams(window.location.search)
         username = params.get('username')!;
         display_name = params.get('display_name')!;
-    message = message + `Step 2/4 Complete: Successfully verified social identity from Twitter account \nUsername: ${username} \nName: ${display_name} \n`
+    message = message + `Step 1/4 Complete: Successfully verified social identity from Twitter account \nUsername: ${username} \nName: ${display_name} \n`;
     setTextAreaValue(message);
     }, [])
 
@@ -33,14 +35,23 @@ const Verifier = () => {
       console.log("Error: The extension did not return a valid identity commitment.");
       return;
     }
-    message = message + `Step 3/4 Complete: Your identity material has been generated inside the extension. Please keep it safe and private \n
-    Public Commitment shared by the extension is: ${identityCommitment} \n \n
-    Step 4/4 Started: Adding generated identity to a group on smart contract in a privacy-preserving manner \n
+    const params = new URLSearchParams(window.location.search)
+    username = params.get('username')!;
+    display_name = params.get('display_name')!;
+    message = message + `Step 1/4 Complete: Successfully verified social identity from Twitter account \nUsername: ${username} \nName: ${display_name} \n`;
+    message = message + `Step 2/4 Complete: Your identity material has been generated inside the extension. Please keep it safe and private \n
+    Public Commitment shared by the extension is: ${identityCommitment} \nStep 3/4 Started: Linking decentralized identifier to blockchain address \n`;
+    setTextAreaValue(message);
+    const proverEthAddress: string | undefined = await requestPersonalSignOnIdentityCommitment(identityCommitment!);
+    // need to store in the database which identity commitment corresponds to which blockchain address and which zk proof
+    await addVerifiedIdentity(identityCommitment!, proverEthAddress!, '');
+    message = message + `Step 3/4 Complete: Linked decentralized identifier to blockchain address \n`;
+    setTextAreaValue(message);
+    message = message + `Step 4/4 Started: Adding generated identity to a group on smart contract in a privacy-preserving manner \n
     * Verifier creates a group on the semaphore zk smart contract \n
     * Verifier adds the public material of the generated identity to the group \n
     * After the above two steps, user will now be able to prove his group membership in zero-knowledge way \n`;
     setTextAreaValue(message);
-    await sleep(5000);
     addZkProofToSemaphore();
   }
 
